@@ -1,0 +1,123 @@
+---
+title: "PSTAT 126 Project Part 1"
+author: "Leo Zhang & Stella Ramirez"
+date: "2023-10-20"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(skimr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview of the Data
+
+```{r read data set, include = FALSE}
+melb_dataframe <- read.csv("melb_data.csv")
+head(melb_dataframe)
+```
+
+```{r remove unwanted variables, include = FALSE}
+# Removed some variables that I feel somewhat repetitive and irrelevant
+melb_dataframe <- melb_dataframe[,-c(1, 6:8, 10:11, 17:19)]
+head(melb_dataframe)
+```
+
+```{r modify YearBuilt, include = FALSE}
+# Need 2 INDEPENDENT categorical variables, idk maybe Type and Region are somehow related, so converting YearBuilt to a categorical data here
+melb_dataframe[,"YearBuilt"][melb_dataframe[,"YearBuilt"] < 1946] <- "Pre-WW2"
+melb_dataframe[,"YearBuilt"][melb_dataframe[,"YearBuilt"] %in% 1946:1964] <- "Boomers"
+melb_dataframe[,"YearBuilt"][melb_dataframe[,"YearBuilt"] %in% 1965:1980] <- "Gen X"
+melb_dataframe[,"YearBuilt"][melb_dataframe[,"YearBuilt"] %in% 1981:1994] <- "Millennials"
+melb_dataframe[,"YearBuilt"][melb_dataframe[,"YearBuilt"] %in% 1995:2009] <- "Gen Z"
+melb_dataframe[,"YearBuilt"][melb_dataframe[,"YearBuilt"] %in% 2009:2023] <- "Modern"
+melb_dataframe[,"YearBuilt"]
+ggplot(data = melb_dataframe, mapping = aes(YearBuilt)) + geom_bar()
+# A lot of NA's here...idk what to do with this, I think it should be fine?
+```
+
+```{r random 500 rows, include = FALSE}
+# Randomly drawing 500 rows to be our dataset
+set.seed(5687538)
+random_melb_df <- melb_dataframe[sample(1:13580, 500, replace = FALSE),]
+head(random_melb_df)
+```
+
+This dataset is a snapshot of the "Melbourne Housing Market" dataset created by Tony Pino, downloaded from Kaggle. It was scraped from publicly available results posted every week from Domain.com.au. The dataset includes Address, Type of Real Estate, Suburb, Method of Selling, Rooms, Price, Real Estate Agent, Date of Sale and Distance from C.B.D.
+
+# Description of Variables
+
+Each observation/row represents an individual real estate property. The variables/columns are listed below:\
+1. Address: The address of the property\
+2. Rooms: The number of rooms in the property\
+3. Type: "br" - bedroom(s); "h" - house, cottage, villa, semi, terrace; "u" - unit, duplex; "t" - townhouse; "dev site" - development site; "o res" - other residential\
+4. Price: The price of the most recent transaction of the property, in dollars\
+5. Distance: Distance from CBD\
+6. Bathroom: Number of bathrooms\
+7. Car: Number of carspots\
+8. Landsize: The land size of the property\
+9. BuildingArea: The building size of the property\
+10. YearBuilt: The year of the property built, "Pre-WW2" - Before 1946; "Boomers" - 1946 - 1964; "Gen X" - 1965 - 1980; "Millennials" - 1981 - 1994; "Gen Z" - 1995 - 2009; "Modern" - After 2009\
+11. Regionname: General region (West, North West, North, North East, etc.)\
+12. Propertycount: Number of properties that exist in the suburb\
+
+# Summary of Statistics
+
+```{r summarize data, echo = FALSE}
+skim(random_melb_df)
+```
+
+# Graphics
+
+*In the following section, we have included several graphics we created when investigating the dataset.*
+
+**The first graph**, depicted below, displays the relationship between the building area and its price. We have scaled the y-axis to have a better view of the data points. It appears there is some positive correlation between these variables, as when the building area increases, the price does as well. Without any calculations, we can observe that the mean of this data may lie in the cluster around 150 square meters. Additionally, we note that there appears to be one outlier to the far right.
+
+```{r area graphic, echo = FALSE, fig.cap="(Building Area/Price Graphic)"}
+plot(random_melb_df$BuildingArea, random_melb_df$Price*(1/1000000), main = "Building Area and Price", ylab="Price in Millions", xlab="Building Area", pch=20, cex=.4, col="blue")
+```
+
+**Similarly**, we swapped out building area for landsize to see if there was a similar correlation. While it does appear there may be some positive correlation here, it is not as clear as it was with the building area comparison. It is important to note that there is an outlier we have not included in this graph, in order to properly view the distribution of points.
+
+```{r landsize graphic, echo = FALSE, fig.cap="(Landsize/Price Graphic)"}
+plot(random_melb_df$Landsize*(1/1000000), random_melb_df$Price*(1/1000000), main = "Landsize and Price", ylab="Price in Millions", xlab="Landsize in Millions", pch=20, cex=.4, col="red", xlim = c(0,0.01))
+```
+
+**Next**, this second graphic displays compares the number of rooms to the price, again in millions. This graph could suggest a slight correlation between the two, however it is not as clear as in the data above.
+
+```{r rooms graphic, echo = FALSE, fig.cap="(Room Number/Price Graphic)"}
+plot(random_melb_df$Rooms, random_melb_df$Price*(1/1000000), main = "Number of Rooms and Price", ylab="Price in Millions", xlab="Number of Rooms", pch=20)
+```
+
+**In order** to continue to explore room number as a predictor, we created the following barplot to visualize the distribution. This data is as expected, with a mean of about 3 rooms and a somewhat symmetric appearance around that mean. While these two plots may not suggest a direct relationship between increasing rooms and increasing price, they may allow us to consider how higher frequency of properties with the average amount of rooms may contribute to the lesser change in price.
+
+```{r rooms dist, echo=FALSE, fig.cap="(Room Distribution Graphic)"}
+rooms_table <- table(random_melb_df$Rooms) 
+barplot(rooms_table, main = "Distribution of Number of Rooms", xlab = "Number of Rooms", ylab = "Number of Properties", col = "purple")
+```
+
+**The final graph** depicts the distributions of cost in each generation. Each box shows the minimum, maximum, median, and the interquartile range. As you can see, there is not a huge amount of change over the years, but it is interesting to note the outlying points on each.
+
+```{r, echo=FALSE, fig.cap="(Generation/Price Graphic)"}
+boxplot(random_melb_df$Price*(1/1000000) ~ random_melb_df$YearBuilt, main = "Generation Built to Price", ylab = "Price in Millions", xlab="Generation Built")
+```
+
+# Additional Comments
+
+While familiarizing ourselves with the "Melbourne Housing Market" data set, we observed the following:
+
+-   Price appears to be a good choice as the responsive variable, as we have explored ways in which the other variables act as predictors
+
+-   Unsurprisingly, the area of the property and the landsize appears to impact the price
+
+-   When creating the graphs, we expected a bit more of a correlation between the number of rooms and the price, and were slightly surprised by the data
+
+-   We note that this data set observes Melbourne and the regions within it, and may be used to predict future home values or trends in the housing market
+
+    -   It also may provide us with an observation of housing prices in general, extending outward from specifically Melbourne, however it is important to consider that other factors will have different influence in different regions of the world
+
+-   Taking a sample of 500 randomly chosen data points from this large set allowed us to get an accurate view of the data without being overwhelmed by data
