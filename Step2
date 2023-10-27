@@ -1,0 +1,1 @@
+random_melb_df <- melb_dataframe[sample(1:13580, 500, replace = FALSE),]
