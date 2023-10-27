@@ -7,6 +7,10 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# load packages
+library(tidyverse)
+library(tidymodels)
+library(modelr)
 ```
 
 ```{r setup, include=FALSE}
@@ -35,8 +39,56 @@ train2_500 <- train2[sample(1:1460, 500, replace = FALSE),]
 
 
 ```{r}
-ggplot(data = train2_500, mapping = aes(x = GarageCars, y = SalePrice)) + 
+ggplot(data = train2_500, mapping = aes(x = BsmtFinSF1, y = SalePrice)) + 
   geom_point(alpha = 0.1) +
   labs(title="SalePrice vs. GarageCars") +
   xlab("GarageCars") + ylab("SalePrice")
+```
+
+#### Linear Model
+```{r}
+fit <- lm(SalePrice ~ ., train2_500)
+fit_BsmtFinSF1 <- lm(SalePrice ~ BsmtFinSF1, train2_500)
+summary(fit_BsmtFinSF1)
+augment(fit_BsmtFinSF1, train2_500) %>% head(4)
+```
+
+```{r, echo = T, fig.width = 8, fig.height = 3}
+# panel of residual plots
+augment(fit_BsmtFinSF1, train2_500) %>%
+  pivot_longer(cols = c(.fitted, BsmtFinSF1)) %>%
+  ggplot(aes(y = .resid, x = value)) +
+  facet_wrap(~ name, scales = 'free_x') +
+  geom_point() +
+  geom_hline(aes(yintercept = 0)) +
+  geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
+```
+
+```{r, echo = T}
+# add quadratic term in expenditure
+fit_BsmtFinSF1_q <- lm(SalePrice ~ poly(BsmtFinSF1, 2, raw = T), data = train2_500)
+```
+
+```{r}
+# normality check
+augment(fit_BsmtFinSF1_q, train2_500) %>%
+  ggplot(aes(sample = .resid)) +
+  geom_qq() +
+  geom_qq_line()
+```
+
+#### t-test
+
+```{r}
+n <- dim(train2_500)[1] # number of observations, or equivalently use nrow(statedata)
+p <- 1 # number of predictors
+round(coefficients(summary(fit_BsmtFinSF1_q)), 5)
+```
+
+#### Plot transformed
+```{r}
+# ggplot(data = train2_500, mapping = aes(x = poly(BsmtFinSF1, 2, raw = T), y = SalePrice))+
+#   geom_point(alpha = 0.1) +
+#   labs(title="SalePrice vs. GarageCars") +
+#   xlab("GarageCars") + ylab("SalePrice")
 ```
