@@ -1,3 +1,10 @@
+Introduction: We are using the variables BsmtFinSF1 and SalePrice as our variables of interest. 
+The BsmtFinSF1 variable is our predictor variable that we will use for hypothesis testing and plotting.
+The BsmtFinSF1 variable refers to the basement finished area square feet in the overall housing data.
+The SalePrice variable refers to the property's sale price in dollars, and it is our response, or dependent, variable that is affected by BsmtFinSF1.
+The original data source is from House Prices - Advanced Regression Techniques from the year 2016 found on Kaggle.
+The population that we are inferring our results on are from every property sampled in our data set that is from all residential houses in Ames, Iowa.
+
 ---
 title: "PSTAT126 Project Step-2"
 author: "Liuqian Bao"
