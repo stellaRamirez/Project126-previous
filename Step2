@@ -105,6 +105,12 @@ With 95% confidence, a 1 square foot increase in basement square feet is associa
 summary(fit_BsmtFinSF1)$adj.r.squared
 ```
 
+Our model has an Adjusted R-squared value of 0.1482. This tells us that 14.82% of the variance in SalePrice is explained by our simple linear model with the explanatory 
+variable basement finished area(BsmtFinSF1). This means our model explained only a relatively  small amount of the variance, but it is reasonable considering we are only 
+using one variable. 
+
+
+
 In the following section is our original attempt to use the poly function to adjust linearity. However, we found this is unneeded in this case as the ggplots are very similar.
 
 ```{r, echo = T}
