@@ -32,8 +32,8 @@ The population that we are inferring our results on are from every property samp
 
 
 Hypothesis: Our hypothesis will be based on our predictor variable, BsmtFinSF1, and the response variable, SalePrice. We will address the
-relationship and correlation in our hypthesis, through testing. Our null hypothesis is that BsmtFinSF1 and SalePrice are linearly 
-related. Our alternative hypothesis is that BsmtFinSF1 and SalePrice are not linearly related. 
+relationship and correlation in our hypthesis, through testing. Our null hypothesis is that BsmtFinSF1 and SalePrice are positively linearly 
+related in that B1>0. Our alternative hypothesis is that BsmtFinSF1 and SalePrice are not positively linearly related in that B1<0 or B1=0. 
 
 ```{r include=FALSE}
 # Variable Selection
