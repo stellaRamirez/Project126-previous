@@ -106,7 +106,7 @@ summary(fit_BsmtFinSF1)$adj.r.squared
 ```
 
 Our model has an Adjusted R-squared value of 0.1482. This tells us that 14.82% of the variance in SalePrice is explained by our simple linear model with the explanatory 
-variable basement finished area(BsmtFinSF1). This means our model explained only a relatively  small amount of the variance, but it is reasonable considering we are only 
+variable basement finished area(BsmtFinSF1). This means our model explains a relatively  small amount of the variance, but it is reasonable considering we are only 
 using one variable. 
 
 
