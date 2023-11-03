@@ -5,6 +5,10 @@ The SalePrice variable refers to the property's sale price in dollars, and it is
 The original data source is from House Prices - Advanced Regression Techniques from the year 2016 found on Kaggle.
 The population that we are inferring our results on are from every property sampled in our data set that is from all residential houses in Ames, Iowa.
 
+Hypothesis: Our hypothesis will be based on our predictor variable, BsmtFinSF1, and the response variable, SalePrice. We will address the
+relationship and correlation in our hypthesis, through testing. Our null hypothesis is that BsmtFinSF1 and SalePrice are linearly 
+related. Our alternative hypothesis is that BsmtFinSF1 and SalePrice are not linearly related. 
+ 
 ---
 title: "PSTAT126 Project Step-2"
 author: "Liuqian Bao"
