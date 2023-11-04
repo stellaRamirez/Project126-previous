@@ -31,9 +31,8 @@ The original data source is from House Prices - Advanced Regression Techniques f
 The population that we are inferring our results on are from every property sampled in our data set that is from all residential houses in Ames, Iowa.
 
 
-Hypothesis: Our hypothesis will be based on our predictor variable, BsmtFinSF1, and the response variable, SalePrice. We will address the
-relationship and correlation in our hypthesis, through testing. Our null hypothesis is that BsmtFinSF1 and SalePrice are positively linearly 
-related in that B1>0. Our alternative hypothesis is that BsmtFinSF1 and SalePrice are not positively linearly related in that B1<0 or B1=0. 
+Hypothesis: Our hypothesis will be based on our predictor variable, BsmtFinSF1, and the response variable, SalePrice. Our null hypothesis is that BsmtFinSF1 
+and SalePrice are not linearly correlated, beta_1 = 0. Our alternative hypothesis is that BsmtFinSF1 and SalePrice are positively correlated, beta_1 > 0.
 
 ```{r include=FALSE}
 # Variable Selection
