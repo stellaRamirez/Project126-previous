@@ -140,3 +140,17 @@ n <- dim(train2_500)[1] # number of observations, or equivalently use nrow(state
 p <- 1 # number of predictors
 round(coefficients(summary(fit_BsmtFinSF1_q)), 5)
 ```
+
+
+
+Summary: We have obtained the results of our hypothesis about whether we reject or fail to reject the hypothesis that B0=0. 
+We then checked the assumptions for linear regression, with the results being  
+Next, we computed the test and found the CI for B1, with the results being a 1 square foot increase in basement square feet being associated with an increase in average sales prices from 58.24 to 89.14 with 95 percent confidence. 
+We then plotted our predictor variable with our response variable, with the CI for the mean and individual response being . 
+We also have the fit of our model and the R^2 value for the residuals of our plot being an Adjusted R-squared value of 0.1482. 
+The test of CI for B1 is of interest to us since an increase in average sales prices from 58.24 to 89.14 with 95 percent confidence is certainly notable given our data and residuals plot.  
+Another interesting aspect was our Adjusted R-squared value of 0.1482 showing that 14.82% of the variance in SalePrice is explained by the simple linear model, meaning our model explained a relatively small amount of the variance. 
+This is interesting information to us given the nature of our regression model as a single variable model, giving us validation that we were in the right direction.   
+The data we obtained were mostly what we expected to get since the plot turned out to be along our expectations. 
+Other questions that we would like to ask about the data is whether the data can be influenced by other variables. 
+Also, another question of interest may be whether a transformation of the residuals plot by a function would impact the linearity and residuals of the plot. 
