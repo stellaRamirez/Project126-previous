@@ -69,59 +69,65 @@ augment(fit_BsmtFinSF1, train2_500) %>%
   geom_point(alpha = 0.3) +
   geom_hline(aes(yintercept = 0)) +
   geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
+```
 
-# qq plot
+```{r}
+#normality check (ORIGINAL MODEL)
 augment(fit_BsmtFinSF1, train2_500) %>%
   ggplot(aes(sample = .resid)) +
   geom_qq() +
   geom_qq_line()
 ```
-#### Log Model
 
-##### Plot log transformed data
-```{r}
-ggplot(data = train2_500, aes(x = BsmtFinSF1, y = log(SalePrice))) + 
-  geom_point(alpha = 0.3) +
-  labs(title="SalePrice vs. BsmtFinSF1") +
-  xlab("BsmtFinSF1") + 
-  ylab("SalePrice") +
-  geom_smooth(method = "lm", formula = 'y ~ x', se = F)
-```
+#### Log Model
 
 ```{r, echo = T}
 # fit log response
 fit_BsmtFinSF1_log <- lm(log(SalePrice) ~ BsmtFinSF1, data = train2_500)
 ```
 
+##### Plot log transformed data
 ```{r}
-# normality check
+ggplot(data = train2_500, aes(x = BsmtFinSF1, y = log(SalePrice))) + 
+  geom_point(alpha = 0.3) +
+  labs(title="Log of SalePrice vs. BsmtFinSF1") +
+  xlab("BsmtFinSF1") + 
+  ylab("Log of SalePrice") +
+  geom_smooth(method = "lm", formula = 'y ~ x', se = F)
+```
+
+```{r, echo = T, fig.width = 8, fig.height = 3}
+# panel of residual plots WITH log transformation
 augment(fit_BsmtFinSF1_log, train2_500) %>%
   pivot_longer(cols = c(.fitted, BsmtFinSF1)) %>%
   ggplot(aes(y = .resid, x = value)) +
   facet_wrap(~ name, scales = 'free_x') +
-  geom_point(alpha = 0.3) +
+  geom_point() +
   geom_hline(aes(yintercept = 0)) +
   geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
+```
 
-# qq plot
+```{r}
+#normality check (WITH LOG MODEL)
 augment(fit_BsmtFinSF1_log, train2_500) %>%
   ggplot(aes(sample = .resid)) +
   geom_qq() +
   geom_qq_line()
 ```
-
 #### t-test for beta_1
 
 ```{r echo=FALSE}
-coefficients(summary(fit_BsmtFinSF1))
+#finding p value
+summary(fit_BsmtFinSF1)$coef
+#with LOGGED model
+summary(fit_BsmtFinSF1_log)$coef
 ```
-
 We are doing a one sided test, so the p-value will be divided by 2. As a result, we get a very small p-value, 1.24e-19, which allows us to reject our null hypothesis that beta_1 = 0 and accept our alternative hypothesis that beta_1 > 0. Our conclusion from the t-test is that BsmtFinSF1 is positively correlated with the SalePrice. 
-
 
 #### confidence interval for beta_1(BsmtFinSF1)
 ```{r echo=FALSE}
 confint(fit_BsmtFinSF1, 'BsmtFinSF1', level = 0.95)
+#with LOGGED model
 confint(fit_BsmtFinSF1_log, 'BsmtFinSF1', level = 0.95)
 ```
 
@@ -134,26 +140,112 @@ With 95% confidence, a 1 square foot increase in basement square feet is associa
 ##### Confidence interval for mean 
 
 ```{r}
-x_bar <- train2_500 %>% select(BsmtFinSF1) %>% summarise(across(everything(),mean))
+# confidence interval for the mean og model
+x_bar <- train2_500 %>% select(BsmtFinSF1) %>% summarise(across(everything(), mean))
 predict(fit_BsmtFinSF1, newdata = x_bar, interval = 'confidence', level = 0.95)
+
+# confidence interval for the mean with LOGGED MODEL
+x_bar <- train2_500 %>% select(BsmtFinSF1) %>% summarise(across(everything(), mean))
+predict(fit_BsmtFinSF1_log, newdata = x_bar, interval = 'confidence', level = 0.95)
 ```
-
-
-##### Confidence interval for individual response
+##### Prediction interval for individual response
 
 ```{r}
-predict(fit_BsmtFinSF1, newdata = train2_500[100, 'BsmtFinSF1'], interval = 'prediction', level = 0.95)
-```
+#prediction interval for a particular value og model
+predict(fit_BsmtFinSF1, newdata = train2_500[500,'BsmtFinSF1'], interval = 'prediction', level = 0.95)
 
+#prediction interval for a particular value with LOGGED MODEL
+predict(fit_BsmtFinSF1_log, newdata = train2_500[500,'BsmtFinSF1'], interval = 'prediction', level = 0.95)
+```
 
 #### R^2
 
 ```{r}
-summary(fit_BsmtFinSF1)
-summary(fit_BsmtFinSF1_log)
+summary(fit_BsmtFinSF1)$adj.r.squared
+#with LOGGED model
+summary(fit_BsmtFinSF1_log)$adj.r.squared
+```
+Our model has an Adjusted R-squared value of 0.1482. This tells us that 14.82% of the variance in SalePrice is explained by our simple linear model with the explanatory variable basement finished area(BsmtFinSF1). This means our model explains only a relatively  small amount of the variance, but it is reasonable considering we are only using one variable. 
+
+#### Plot transformed with fit linear line and add confidence bands + prediction bands
+
+```{r}
+p <- ggplot(train2_500, aes(x = BsmtFinSF1, y = log(SalePrice))) + 
+  geom_point() +
+  labs(x = 'Finished Basement Area',
+       y = 'Log of Sale Price')
+
+p + geom_smooth(method = 'lm', formula = 'y ~ x', se = F)
 ```
 
-Our model has an Adjusted R-squared value of 0.1482. This tells us that 14.82% of the variance in SalePrice is explained by our simple linear model with the explanatory variable basement finished area(BsmtFinSF1). This means our model explains only a relatively  small amount of the variance, but it is reasonable considering we are only using one variable. 
+```{r}
+# prediction grid
+train2_500 %>% 
+  data_grid(BsmtFinSF1 = BsmtFinSF1, 
+            .model = fit_BsmtFinSF1_log)
+# append predictions
+train2_500 %>% 
+  data_grid(BsmtFinSF1 = BsmtFinSF1, .model = fit_BsmtFinSF1_log) %>%
+  add_predictions(model = fit_BsmtFinSF1_log) %>%
+  head()
+```
+
+```{r}
+# compute confidence limits
+predict(fit_BsmtFinSF1_log, 
+        newdata = pred_df_train, 
+        interval = 'confidence', 
+        level = 0.95) %>% 
+  head()
+```
+
+```{r}
+# compute PREDICTION limits
+predict(fit_BsmtFinSF1_log, 
+        newdata = pred_df_train, 
+        interval = 'prediction', 
+        level = 0.95) %>% 
+  head()
+```
+
+```{r}
+# add confidence limits
+pred_df_train_ci <- pred_df_train %>%
+  cbind(ci = predict(fit_BsmtFinSF1_log, 
+                     newdata = pred_df_train, 
+                     interval = 'confidence', 
+                     level = 0.95))
+
+pred_df_train_ci %>% head()
+```
+
+```{r}
+# add prediction limits
+pred_df_train_pr <- pred_df_train %>%
+  cbind(pr = predict(fit_BsmtFinSF1_log, 
+                     newdata = pred_df_train, 
+                     interval = 'prediction', 
+                     level = 0.95))
+
+pred_df_train_pr %>% head()
+```
+
+```{r}
+# add uncertainty bands
+p + geom_ribbon(aes(ymin = ci.lwr, 
+                  ymax = ci.upr, 
+                  y = ci.fit), 
+              data = pred_df_train_ci, 
+              fill = 'red', 
+              alpha = 0.3) +
+    geom_ribbon(aes(ymin = pr.lwr, 
+                  ymax = pr.upr, 
+                  y = pr.fit), 
+              data = pred_df_train_pr, 
+              fill = 'purple', 
+              alpha = 0.3) +
+    geom_smooth(method = 'lm', formula = 'y ~ x', se = F)
+```
 
 
 Summary: We have obtained the results of our hypothesis about whether we reject or fail to reject the hypothesis that B0=0. 
