@@ -196,6 +196,13 @@ train2_500 %>%
 ```
 
 ```{r}
+# store prediction grid
+pred_df_train <- train2_500 %>%
+  data_grid(BsmtFinSF1 = BsmtFinSF1, .model = fit_BsmtFinSF1_log) %>%
+  add_predictions(model = fit_BsmtFinSF1_log)
+```
+
+```{r}
 # compute confidence limits
 predict(fit_BsmtFinSF1_log, 
         newdata = pred_df_train, 
