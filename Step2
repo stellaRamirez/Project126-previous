@@ -154,14 +154,26 @@ x_bar <- train2_500 %>% select(BsmtFinSF1) %>% summarise(across(everything(), me
 predict(fit_BsmtFinSF1_log, newdata = x_bar, interval = 'confidence', level = 0.95)
 ```
 ##### Prediction interval for individual response
-
 ```{r}
+#find point of interest
+max(train2_500$BsmtFinSF1)
+train2_500[175,'BsmtFinSF1']
+```
+```{r}
+#store point
+x_pt_comp <- train2_500[175,'BsmtFinSF1']
+x_pt <- x_pt_comp %>% select(BsmtFinSF1)
+#remove from dataset
+train2_500 <- train2_500 %>% slice(-as.numeric(rownames(x_pt)))
+
+
 #prediction interval for a particular value og model
-predict(fit_BsmtFinSF1, newdata = train2_500[500,'BsmtFinSF1'], interval = 'prediction', level = 0.95)
+predict(fit_BsmtFinSF1, newdata = x_pt, interval = 'prediction', level = 0.95)
 
 #prediction interval for a particular value with LOGGED MODEL
-predict(fit_BsmtFinSF1_log, newdata = train2_500[500,'BsmtFinSF1'], interval = 'prediction', level = 0.95)
+predict(fit_BsmtFinSF1_log, newdata = x_pt, interval = 'prediction', level = 0.95)
 ```
+
 
 #### R^2
 
