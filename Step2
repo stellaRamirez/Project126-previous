@@ -34,16 +34,18 @@ train2
 set.seed(12345)
 train2_500 <- train2[sample(1:1460, 500, replace = FALSE),]
 ```
-Introduction: We are using the variables BsmtFinSF1 and SalePrice as our variables of interest. 
+#### Introduction
+
+Our data source is from: Anna Montoya, DataCanary. (2016). House Prices - Advanced Regression Techniques. Kaggle.Obtained from https://kaggle.com/competitions/house-prices-advanced-regression-techniques (https://kaggle.com/competitions/house-pricesadvanced-regression-techniques)
+
+The population that we are inferring our results on are all residential houses in Ames, Iowa.
+
+We are using the variables BsmtFinSF1 and SalePrice as our variables of interest. 
 The BsmtFinSF1 variable is our predictor variable that we will use for hypothesis testing and plotting.
 The BsmtFinSF1 variable refers to the basement finished area square feet in the overall housing data.
-The SalePrice variable refers to the property's sale price in dollars, and it is our response, or dependent, variable that is affected by BsmtFinSF1.
-The original data source is from House Prices - Advanced Regression Techniques from the year 2016 found on Kaggle.
-The population that we are inferring our results on are from every property sampled in our data set that is from all residential houses in Ames, Iowa.
-We have done the log-transformation in order to better fit our model.
+The SalePrice variable refers to the property's sale price in dollars, and it is our response, or dependent, variable that is affected by BsmtFinSF1. 
 
-Hypothesis: Our hypothesis will be based on our predictor variable, BsmtFinSF1, and the response variable, SalePrice. Our null hypothesis is that BsmtFinSF1 
-and SalePrice are not linearly correlated, beta_1 = 0. Our alternative hypothesis is that BsmtFinSF1 and SalePrice are positively correlated, beta_1 > 0.
+We first fitted a simple linear model, and after exploring the data and checking model assumptions, we did a log-transformation on our response variable in order to fit the model better.
 
 ```{r}
 ggplot(data = train2_500, mapping = aes(x = BsmtFinSF1, y = SalePrice)) + 
