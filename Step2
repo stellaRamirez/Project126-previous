@@ -29,6 +29,7 @@ The BsmtFinSF1 variable refers to the basement finished area square feet in the 
 The SalePrice variable refers to the property's sale price in dollars, and it is our response, or dependent, variable that is affected by BsmtFinSF1.
 The original data source is from House Prices - Advanced Regression Techniques from the year 2016 found on Kaggle.
 The population that we are inferring our results on are from every property sampled in our data set that is from all residential houses in Ames, Iowa.
+We have done the log-transformation in order to better fit our model.
 
 
 Hypothesis: Our hypothesis will be based on our predictor variable, BsmtFinSF1, and the response variable, SalePrice. Our null hypothesis is that BsmtFinSF1 
@@ -147,6 +148,7 @@ Summary: We have obtained the results of our hypothesis about whether we reject 
 We then checked the assumptions for linear regression, with the results being  
 Next, we computed the test and found the CI for B1, with the results being a 1 square foot increase in basement square feet being associated with an increase in average sales prices from 58.24 to 89.14 with 95 percent confidence. 
 We then plotted our predictor variable with our response variable, with the CI for the mean and individual response being . 
+We have done the log transformation to our model in order to better compare and fit our model, and to make our data as well as hypothesis testing more meaningful. 
 We also have the fit of our model and the R^2 value for the residuals of our plot being an Adjusted R-squared value of 0.1482. 
 The test of CI for B1 is of interest to us since an increase in average sales prices from 58.24 to 89.14 with 95 percent confidence is certainly notable given our data and residuals plot.  
 Another interesting aspect was our Adjusted R-squared value of 0.1482 showing that 14.82% of the variance in SalePrice is explained by the simple linear model, meaning our model explained a relatively small amount of the variance. 
