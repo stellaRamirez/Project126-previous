@@ -144,6 +144,25 @@ With 95% confidence, a 1 square foot increase in basement square feet is associa
 
 ##### Confidence interval for mean 
 
+The following graph displays the line at which the following confidence interval is calculated.
+
+```{r}
+train2_500 %>% 
+  pivot_longer(cols = BsmtFinSF1,
+               names_to = 'variable',
+               values_to = 'value') %>%
+  ggplot(aes(x=value, y = log(SalePrice))) +
+  facet_wrap(~ variable, scales = 'free_x', nrow=1) +
+  geom_point() +
+  labs(x = '', y = 'SalePrice') +
+  geom_vline(data = pivot_longer(x_pt,
+                                  everything(),
+                                  names_to= 'variable',
+                                  values_to = 'value'),
+              aes(xintercept = value),
+              color = 'blue')
+```
+
 ```{r}
 # confidence interval for the mean og model
 x_bar <- train2_500 %>% select(BsmtFinSF1) %>% summarise(across(everything(), mean))
