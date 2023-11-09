@@ -47,6 +47,9 @@ The SalePrice variable refers to the property's sale price in dollars, and it is
 
 We first fitted a simple linear model, and after exploring the data and checking model assumptions, we did a log-transformation on our response variable in order to fit the model better.
 
+Hypothesis: Our hypothesis is based on the predictor variable, BsmtFinSF1, and the response variable, SalePrice. Our null hypothesis is that BsmtFinSF1 
+and SalePrice are not linearly correlated, beta_1 = 0. Our alternative hypothesis is that BsmtFinSF1 and SalePrice are positively correlated, beta_1 > 0.
+
 ```{r}
 ggplot(data = train2_500, mapping = aes(x = BsmtFinSF1, y = SalePrice)) + 
   geom_point(alpha = 0.3) +
