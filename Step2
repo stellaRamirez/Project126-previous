@@ -201,6 +201,11 @@ pred_df_train <- train2_500 %>%
   data_grid(BsmtFinSF1 = BsmtFinSF1, .model = fit_BsmtFinSF1_log) %>%
   add_predictions(model = fit_BsmtFinSF1_log)
 ```
+This gives us the path: 
+```{r}
+# plot path
+p + geom_path(aes(y = pred), data = pred_df_train)
+```
 
 ```{r}
 # compute confidence limits
