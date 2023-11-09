@@ -5,13 +5,6 @@ date: "2023-10-27"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-# load packages
-library(tidyverse)
-library(tidymodels)
-library(modelr)
-```
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -20,20 +13,12 @@ library("dplyr")
 options(max.print=1000000)
 library(readxl)
 library(ggplot2)
-train <- read_excel("C:/Users/baoli/Desktop/PSTAT126/house-prices-advanced-regression-techniques/train.xlsx") 
+# load packages
+library(tidyverse)
+library(tidymodels)
+library(modelr)
+train <- read_excel("C:/Users/baoli/Desktop/PSTAT126/Project/house-prices-advanced-regression-techniques/train.xlsx") 
 ```
-
-Introduction: We are using the variables BsmtFinSF1 and SalePrice as our variables of interest. 
-The BsmtFinSF1 variable is our predictor variable that we will use for hypothesis testing and plotting.
-The BsmtFinSF1 variable refers to the basement finished area square feet in the overall housing data.
-The SalePrice variable refers to the property's sale price in dollars, and it is our response, or dependent, variable that is affected by BsmtFinSF1.
-The original data source is from House Prices - Advanced Regression Techniques from the year 2016 found on Kaggle.
-The population that we are inferring our results on are from every property sampled in our data set that is from all residential houses in Ames, Iowa.
-We have done the log-transformation in order to better fit our model.
-
-
-Hypothesis: Our hypothesis will be based on our predictor variable, BsmtFinSF1, and the response variable, SalePrice. Our null hypothesis is that BsmtFinSF1 
-and SalePrice are not linearly correlated, beta_1 = 0. Our alternative hypothesis is that BsmtFinSF1 and SalePrice are positively correlated, beta_1 > 0.
 
 ```{r include=FALSE}
 # Variable Selection
@@ -45,16 +30,26 @@ train2
 ```
 
 ```{r}
+# randomly choose 500 observations
 set.seed(12345)
 train2_500 <- train2[sample(1:1460, 500, replace = FALSE),]
 ```
+Introduction: We are using the variables BsmtFinSF1 and SalePrice as our variables of interest. 
+The BsmtFinSF1 variable is our predictor variable that we will use for hypothesis testing and plotting.
+The BsmtFinSF1 variable refers to the basement finished area square feet in the overall housing data.
+The SalePrice variable refers to the property's sale price in dollars, and it is our response, or dependent, variable that is affected by BsmtFinSF1.
+The original data source is from House Prices - Advanced Regression Techniques from the year 2016 found on Kaggle.
+The population that we are inferring our results on are from every property sampled in our data set that is from all residential houses in Ames, Iowa.
+We have done the log-transformation in order to better fit our model.
 
+Hypothesis: Our hypothesis will be based on our predictor variable, BsmtFinSF1, and the response variable, SalePrice. Our null hypothesis is that BsmtFinSF1 
+and SalePrice are not linearly correlated, beta_1 = 0. Our alternative hypothesis is that BsmtFinSF1 and SalePrice are positively correlated, beta_1 > 0.
 
 ```{r}
 ggplot(data = train2_500, mapping = aes(x = BsmtFinSF1, y = SalePrice)) + 
-  geom_point(alpha = 0.1) +
-  labs(title="SalePrice vs. GarageCars") +
-  xlab("GarageCars") + ylab("SalePrice")
+  geom_point(alpha = 0.3) +
+  labs(title="SalePrice vs. BsmtFinSF1") +
+  xlab("BsmtFinSF1") + ylab("SalePrice")
 ```
 
 #### Linear Model
@@ -62,8 +57,8 @@ ggplot(data = train2_500, mapping = aes(x = BsmtFinSF1, y = SalePrice)) +
 fit <- lm(SalePrice ~ ., train2_500)
 fit_BsmtFinSF1 <- lm(SalePrice ~ BsmtFinSF1, train2_500)
 summary(fit_BsmtFinSF1)
-augment(fit_BsmtFinSF1, train2_500) %>% head(4)
 ```
+
 
 ```{r, echo = T, fig.width = 8, fig.height = 3}
 # panel of residual plots
@@ -71,77 +66,94 @@ augment(fit_BsmtFinSF1, train2_500) %>%
   pivot_longer(cols = c(.fitted, BsmtFinSF1)) %>%
   ggplot(aes(y = .resid, x = value)) +
   facet_wrap(~ name, scales = 'free_x') +
-  geom_point() +
+  geom_point(alpha = 0.3) +
   geom_hline(aes(yintercept = 0)) +
   geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
-```
 
-```{r}
-# normality check (WITHOUT QUADRATIC)
+# qq plot
 augment(fit_BsmtFinSF1, train2_500) %>%
   ggplot(aes(sample = .resid)) +
   geom_qq() +
   geom_qq_line()
 ```
+#### Log Model
 
-#### t-test
-
+##### Plot log transformed data
 ```{r}
-#finding p value
-summary(fit_BsmtFinSF1)$coef
+ggplot(data = train2_500, aes(x = BsmtFinSF1, y = log(SalePrice))) + 
+  geom_point(alpha = 0.3) +
+  labs(title="SalePrice vs. BsmtFinSF1") +
+  xlab("BsmtFinSF1") + 
+  ylab("SalePrice") +
+  geom_smooth(method = "lm", formula = 'y ~ x', se = F)
 ```
-We are doing a one sided test, so will divide this by 2.
-
-####confidence interval for beta1(BsmtFinSF1)
-```{r}
-confint(fit_BsmtFinSF1, 'BsmtFinSF1', level = 0.95)
-```
-
-With 95% confidence, a 1 square foot increase in basement square feet is associated with an increase in average sales prices between an estimated 58.24 and 89.14.
-
-
-####r squared
-```{r}
-summary(fit_BsmtFinSF1)$adj.r.squared
-```
-
-Our model has an Adjusted R-squared value of 0.1482. This tells us that 14.82% of the variance in SalePrice is explained by our simple linear model with the explanatory 
-variable basement finished area(BsmtFinSF1). This means our model explains a relatively  small amount of the variance, but it is reasonable considering we are only 
-using one variable. 
-
-
-
-In the following section is our original attempt to use the poly function to adjust linearity. However, we found this is unneeded in this case as the ggplots are very similar.
 
 ```{r, echo = T}
-# add quadratic term in expenditure
-fit_BsmtFinSF1_q <- lm(SalePrice ~ poly(BsmtFinSF1, 2, raw = T), data = train2_500)
+# fit log response
+fit_BsmtFinSF1_log <- lm(log(SalePrice) ~ BsmtFinSF1, data = train2_500)
 ```
-
 
 ```{r}
 # normality check
-augment(fit_BsmtFinSF1_q, train2_500) %>%
+augment(fit_BsmtFinSF1_log, train2_500) %>%
+  pivot_longer(cols = c(.fitted, BsmtFinSF1)) %>%
+  ggplot(aes(y = .resid, x = value)) +
+  facet_wrap(~ name, scales = 'free_x') +
+  geom_point(alpha = 0.3) +
+  geom_hline(aes(yintercept = 0)) +
+  geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
+
+# qq plot
+augment(fit_BsmtFinSF1_log, train2_500) %>%
   ggplot(aes(sample = .resid)) +
   geom_qq() +
   geom_qq_line()
 ```
 
+#### t-test for beta_1
 
-#### Plot transformed
-```{r}
-# ggplot(data = train2_500, mapping = aes(x = poly(BsmtFinSF1, 2, raw = T), y = SalePrice))+
-#   geom_point(alpha = 0.1) +
-#   labs(title="SalePrice vs. GarageCars") +
-#   xlab("GarageCars") + ylab("SalePrice")
+```{r echo=FALSE}
+coefficients(summary(fit_BsmtFinSF1))
 ```
 
-```{r}
-n <- dim(train2_500)[1] # number of observations, or equivalently use nrow(statedata)
-p <- 1 # number of predictors
-round(coefficients(summary(fit_BsmtFinSF1_q)), 5)
+We are doing a one sided test, so the p-value will be divided by 2. As a result, we get a very small p-value, 1.24e-19, which allows us to reject our null hypothesis that beta_1 = 0 and accept our alternative hypothesis that beta_1 > 0. Our conclusion from the t-test is that BsmtFinSF1 is positively correlated with the SalePrice. 
+
+
+#### confidence interval for beta_1(BsmtFinSF1)
+```{r echo=FALSE}
+confint(fit_BsmtFinSF1, 'BsmtFinSF1', level = 0.95)
+confint(fit_BsmtFinSF1_log, 'BsmtFinSF1', level = 0.95)
 ```
 
+With 95% confidence, a 1 square foot increase in basement square feet is associated with an increase in average sales prices between an estimated 58.24 and 89.14.
+
+With 95% confidence, a 1 square foot increase in basement square feet is associated with an increase in average of the log of the sales prices between an estimated 0.0002866904  and 0.0004387075. 
+
+#### Confidence interval for mean and individual response
+
+##### Confidence interval for mean 
+
+```{r}
+x_bar <- train2_500 %>% select(BsmtFinSF1) %>% summarise(across(everything(),mean))
+predict(fit_BsmtFinSF1, newdata = x_bar, interval = 'confidence', level = 0.95)
+```
+
+
+##### Confidence interval for individual response
+
+```{r}
+predict(fit_BsmtFinSF1, newdata = train2_500[100, 'BsmtFinSF1'], interval = 'prediction', level = 0.95)
+```
+
+
+#### R^2
+
+```{r}
+summary(fit_BsmtFinSF1)
+summary(fit_BsmtFinSF1_log)
+```
+
+Our model has an Adjusted R-squared value of 0.1482. This tells us that 14.82% of the variance in SalePrice is explained by our simple linear model with the explanatory variable basement finished area(BsmtFinSF1). This means our model explains only a relatively  small amount of the variance, but it is reasonable considering we are only using one variable. 
 
 
 Summary: We have obtained the results of our hypothesis about whether we reject or fail to reject the hypothesis that B0=0. 
