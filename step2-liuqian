@@ -74,7 +74,7 @@ augment(fit_BsmtFinSF1, train2_500) %>%
   pivot_longer(cols = c(.fitted, BsmtFinSF1)) %>%
   ggplot(aes(y = .resid, x = value)) +
   facet_wrap(~ name, scales = 'free_x') +
-  geom_point(alpha = 0.3) +
+  geom_point() +
   geom_hline(aes(yintercept = 0)) +
   geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
 
@@ -264,7 +264,7 @@ Our model has an Adjusted R-squared value of 0.1482. This tells us that 14.82% o
 
 #### Add confidence bands + prediction bands
 
-```{r echo=F}
+```{r include=F}
 # prediction grid
 train2_500 %>% 
   data_grid(BsmtFinSF1 = BsmtFinSF1, 
@@ -276,7 +276,7 @@ train2_500 %>%
   head()
 ```
 
-```{r echo=F}
+```{r include=F}
 # store prediction grid
 pred_df_train <- train2_500 %>%
   data_grid(BsmtFinSF1 = BsmtFinSF1, .model = fit_BsmtFinSF1_log) %>%
@@ -290,7 +290,7 @@ This gives us the path:
 p + geom_path(aes(y = pred), data = pred_df_train)
 ```
 
-```{r echo=F}
+```{r include=F}
 # compute confidence limits
 predict(fit_BsmtFinSF1_log, 
         newdata = pred_df_train, 
@@ -299,7 +299,7 @@ predict(fit_BsmtFinSF1_log,
   head()
 ```
 
-```{r echo=F}
+```{r include=F}
 # compute PREDICTION limits
 predict(fit_BsmtFinSF1_log, 
         newdata = pred_df_train, 
@@ -308,7 +308,7 @@ predict(fit_BsmtFinSF1_log,
   head()
 ```
 
-```{r echo=F}
+```{r include=F}
 # add confidence limits
 pred_df_train_ci <- pred_df_train %>%
   cbind(ci = predict(fit_BsmtFinSF1_log, 
@@ -319,7 +319,7 @@ pred_df_train_ci <- pred_df_train %>%
 pred_df_train_ci %>% head()
 ```
 
-```{r echo=F}
+```{r include=F}
 # add prediction limits
 pred_df_train_pr <- pred_df_train %>%
   cbind(pr = predict(fit_BsmtFinSF1_log, 
