@@ -46,6 +46,8 @@ The BsmtFinSF1 variable is our predictor variable that we will use for hypothesi
 The BsmtFinSF1 variable refers to the basement finished area square feet in the overall housing data.
 The SalePrice variable refers to the property's sale price in dollars, and it is our response, or dependent, variable that is affected by BsmtFinSF1. 
 
+In our model, we have made it that the population refers to the 500 observations that are randomly picked and it is a sample from the entire sample. 
+
 We first fitted a simple linear model, and after exploring the data and checking model assumptions, we did a log-transformation on our response variable in order to fit the model better.
 
 Hypothesis: Our hypothesis is based on the predictor variable, BsmtFinSF1, and the response variable, SalePrice. Our null hypothesis is that BsmtFinSF1 
@@ -359,6 +361,7 @@ We also have the fit of our model and the R^2 value for the residuals of our plo
 
 The test of CI for B1 is of interest to us since an increase in average sales prices from 58.24 to 89.14 with 95 percent confidence is certainly notable given our data and residuals plot.  
 Another interesting aspect was our Adjusted R-squared value of 0.1482 showing that 14.82% of the variance in SalePrice is explained by the simple linear model, meaning our model explained a relatively small amount of the variance. 
+The interesting feature for the CI of the individual response is that it is wider than expected.
 This is interesting information to us given the nature of our regression model as a single variable model, giving us validation that we were in the right direction.
 
 
