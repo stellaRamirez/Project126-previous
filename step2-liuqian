@@ -156,9 +156,9 @@ confint(fit_BsmtFinSF1_log, 'BsmtFinSF1', level = 0.95)
 
 Interpretation: With 95% confidence, a 1 square foot increase in basement square feet is associated with an increase in average of the log of the sales prices between an estimated 0.0002866904  and 0.0004387075. 
 
-#### Plot transformed with fit linear line and add confidence bands + prediction bands
+#### Plot transformed with fitted linear line
 
-```{r}
+```{r echo=F}
 p <- ggplot(train2_500, aes(x = BsmtFinSF1, y = log(SalePrice))) + 
   geom_point() +
   labs(x = 'Finished Basement Area',
@@ -250,17 +250,19 @@ predict(fit_BsmtFinSF1_log, newdata = x_pt, interval = 'prediction', level = 0.9
 
 Interpretation: With 95% confidence, the predicted log of the SalePrice of a house with a finished basement area of 2096 square feet is estimated to be between 11.86181 and 13.34594. 
 
-Interesting feature: The actual value of the log of the sale price of the 
+Interesting feature: The actual value of the log of the sale price of the house with a finished basement area of 2096 square feet is outside(greater than) the prediction interval we obtained using our model. This is interesting because it tells us it is very challenging to predict sale prices of houses that are extremely large(judged by its basement area), potentially some luxury properties, using a simple linear model as the one we built. 
 
 #### R^2
 
-```{r}
+```{r echo=F}
 #summary(fit_BsmtFinSF1)$adj.r.squared
 #with LOGGED model
 summary(fit_BsmtFinSF1_log)$adj.r.squared
 ```
 
 Our model has an Adjusted R-squared value of 0.1482. This tells us that 14.82% of the variance in SalePrice is explained by our simple linear model with the explanatory variable basement finished area(BsmtFinSF1). This means our model explains only a relatively  small amount of the variance, but it is reasonable considering we are only using one variable. 
+
+#### Add confidence bands + prediction bands
 
 ```{r echo=F}
 # prediction grid
