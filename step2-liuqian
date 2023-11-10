@@ -160,10 +160,11 @@ Interpretation: With 95% confidence, a 1 square foot increase in basement square
 
 ##### Confidence interval for mean 
 
-The following graph displays the line at which the following confidence interval is calculated.
+The following graph displays the mean of BsmtFinSF1(basement finished area), at which the following CI is calculated and the fitted value of response at the mean of BsmtFinSF1. 
 
-```{r}
+```{r echo=F}
 x_bar <- train2_500 %>% select(BsmtFinSF1) %>% summarise(across(everything(), mean))
+
 train2_500 %>% 
   pivot_longer(cols = BsmtFinSF1,
                names_to = 'variable',
@@ -178,35 +179,64 @@ train2_500 %>%
                                   values_to = 'value'),
               aes(xintercept = value),
               color = 'blue') + 
-  geom_point(aes(x=2096,y=12.60388),colour="red")
+  geom_point(aes(x=445.662,y=12.0053 ),colour="red")
 
 ```
 
-```{r}
+Confidence interval:
+
+```{r echo=F}
 # confidence interval for the mean og model
-predict(fit_BsmtFinSF1, newdata = x_bar, interval = 'confidence', level = 0.95)
+# predict(fit_BsmtFinSF1, newdata = x_bar, interval = 'confidence', level = 0.95)
 
 # confidence interval for the mean with LOGGED MODEL
 predict(fit_BsmtFinSF1_log, newdata = x_bar, interval = 'confidence', level = 0.95)
 ```
-##### Prediction interval for individual response
-```{r}
+
+Interpretation: With 95% confidence, the mean of the log SalePrice for a house with basement area equal to the average in the data is estimated to be between 11.97263 and 12.03798. 
+
+##### Confidence interval for individual response at an interesting x value
+
+```{r echo=F}
 #find point of interest
 max(train2_500$BsmtFinSF1)
 train2_500[175,'BsmtFinSF1']
 ```
 
-```{r}
+
+```{r echo=F}
 #store point
 x_pt_comp <- train2_500[175,'BsmtFinSF1']
 x_pt <- x_pt_comp %>% select(BsmtFinSF1)
+```
 
+```{r include=F}
+train2_500 %>% 
+  pivot_longer(cols = BsmtFinSF1,
+               names_to = 'variable',
+               values_to = 'value') %>%
+  ggplot(aes(x=value, y = log(SalePrice))) +
+  facet_wrap(~ variable, scales = 'free_x', nrow=1) +
+  geom_point() +
+  labs(x = '', y = 'SalePrice') +
+  geom_vline(data = pivot_longer(x_pt,
+                                  everything(),
+                                  names_to= 'variable',
+                                  values_to = 'value'),
+              aes(xintercept = value),
+              color = 'blue') + 
+  geom_point(aes(x=2096,y=12.60388),colour="red")
+
+```
+Confidence interval:
+```{r echo=F}
 #prediction interval for a particular value og model
-predict(fit_BsmtFinSF1, newdata = x_pt, interval = 'prediction', level = 0.95)
+#predict(fit_BsmtFinSF1, newdata = x_pt, interval = 'prediction', level = 0.95)
 
 #prediction interval for a particular value with LOGGED MODEL
 predict(fit_BsmtFinSF1_log, newdata = x_pt, interval = 'prediction', level = 0.95)
 ```
+
 
 #### R^2
 
