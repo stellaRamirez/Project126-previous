@@ -356,7 +356,7 @@ p + geom_ribbon(aes(ymin = ci.lwr,
     geom_smooth(method = 'lm', formula = 'y ~ x', se = F)
 ```
 
-#### Conclusion:
+#### Conclusion \newline
 
 We have obtained the results of our hypothesis about whether we reject or fail to reject the hypothesis that B0=0.
 We then checked the assumptions for linear regression, with the results being\
@@ -374,3 +374,12 @@ The data we obtained were mostly what we expected to get since the plot turned o
 
 Other questions that we would like to ask about the data is whether the data can be influenced by other variables.
 Also, another question of interest may be whether a transformation of the residuals plot by a function would impact the linearity and residuals of the plot.
+
+
+
+
+Interesting feature: 
+
+The conclusion we drew from the t-test for $\beta_1$ lines up with our expectation because we would expect the sale price of a house to be higher if it has a larger finished basement area. The t-test gives a very small p-value, which tells us that the correlation is statistically significant. 
+
+Our finding through the prediction interval at an x level that is the maximum(2096 square feet) of our finished basement area data is also interesting. The actual value of the log of the sale price of the house with a finished basement area of 2096 square feet is outside(greater than) the prediction interval we obtained using our model. It tells us it is very challenging to predict sale prices of houses that are extremely large (judged by its basement area), potentially some luxury properties, using a simple linear model as the one we built.
