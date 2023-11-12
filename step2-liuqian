@@ -55,8 +55,8 @@ The SalePrice variable refers to the property's sale price in dollars, and it is
 We first fitted a simple linear model, and after exploring the data and checking model assumptions, we did a log-transformation on our response variable in order to fit the model better.
 
 Hypothesis: Our hypothesis is based on the predictor variable, BsmtFinSF1, and the response variable, SalePrice.
-Our null hypothesis is that BsmtFinSF1 and SalePrice are not linearly correlated, beta_1 = 0.
-Our alternative hypothesis is that BsmtFinSF1 and SalePrice are positively correlated, beta_1 \> 0.
+Our null hypothesis is that BsmtFinSF1 and SalePrice are not linearly correlated, $\beta_1 = 0$.
+Our alternative hypothesis is that BsmtFinSF1 and SalePrice are positively correlated, $\beta_1 > 0$.
 
 #### Simple Linear Model \newline
 
@@ -138,7 +138,7 @@ These tells us that the log transformed model meets the assumptions we made bett
 
 #### T-test for beta_1 \newline
 
-We performed a t-test on the coefficient of BsmtFinSF1 in our linear model, beta_1.
+We performed a t-test on the coefficient of BsmtFinSF1 in our linear model, $\beta_1$.
 
 Hypothesis: Our hypothesis is based on the predictor variable, BsmtFinSF1, and the response variable, SalePrice.
 Our null hypothesis is that BsmtFinSF1 and SalePrice are not linearly correlated, beta_1 = 0.
@@ -154,12 +154,12 @@ summary(fit_BsmtFinSF1_log)$coef
 ```
 
 Conclusion: We are doing a one sided test, so the p-value will be divided by 2.
-As a result, we get a very small p-value, 1.205e-19, which allows us to reject our null hypothesis that beta_1 = 0 and accept our alternative hypothesis that beta_1 \> 0.
+As a result, we get a very small p-value, 1.205e-19, which allows us to reject our null hypothesis that $\beta_1 = 0$ and accept our alternative hypothesis that $\beta_1 > 0$.
 Our conclusion from the t-test is that BsmtFinSF1 is positively correlated with the log of the SalePrice.
 
 #### confidence interval for beta_1(BsmtFinSF1) \newline
 
-The confidence interval we computed for beta_1 is:
+The confidence interval we computed for $\beta_1$ is:
 
 ```{r echo=FALSE}
 #confint(fit_BsmtFinSF1, 'BsmtFinSF1', level = 0.95)
@@ -223,7 +223,7 @@ Interpretation: With 95% confidence, the mean of the log SalePrice for a house w
 
 We used the point with x(basement finished area) value of 2096 as our point of interest, because this is the largest basement finished area in the 500 observations we used and the point is an outlier in our data.
 
-```{r echo=F}
+```{r echo=F, eval=FALSE}
 #find point of interest
 max(train2_500$BsmtFinSF1)
 train2_500[175,'BsmtFinSF1']
@@ -274,8 +274,8 @@ This is interesting because it tells us it is very challenging to predict sale p
 summary(fit_BsmtFinSF1_log)$adj.r.squared
 ```
 
-Our model has an Adjusted R-squared value of 0.1482.
-This tells us that 14.82% of the variance in SalePrice is explained by our simple linear model with the explanatory variable basement finished area(BsmtFinSF1).
+Our model has an Adjusted R-squared value of 0.1483.
+This tells us that 14.82% of the variance in SalePrice is explained by our simple linear model with the log transformation with the explanatory variable basement finished area(BsmtFinSF1).
 This means our model explains only a relatively small amount of the variance, but it is reasonable considering we are only using one variable.
 
 #### Add confidence bands + prediction bands \newline
@@ -355,6 +355,7 @@ p + geom_ribbon(aes(ymin = ci.lwr,
               alpha = 0.3) +
     geom_smooth(method = 'lm', formula = 'y ~ x', se = F)
 ```
+As you can see from this graph, the prediction band is much wider than the confidence band. This is accurate because while the CI depends on the estimates, the prediction interval at a specific value is influenced by both the estimates and the variation in the response. It is also interesting to note that the values moving to the right of the graph have a wider interval, implying higher uncertainty. Following our analysis, this conclusion supports our suggestion that it may be difficult to use existing data to predict the Sale Price of very large properties.
 
 #### Conclusion \newline
 
