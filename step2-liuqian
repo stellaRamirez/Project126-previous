@@ -357,7 +357,7 @@ We then checked the assumptions for linear regression, with the results being\
 Next, we computed the test and found the CI for B1, with the results being a 1 square foot increase in basement square feet being associated with an increase in average sales prices from 58.24 to 89.14 with 95 percent confidence.
 We then plotted our predictor variable with our response variable, with the CI for the mean and individual response being .
 We have done the log transformation to our model in order to better compare and fit our model, and to make our data as well as hypothesis testing more meaningful.
-We also have the fit of our model and the R\^2 value for the residuals of our plot being an Adjusted R-squared value of 0.1482.
+We also have the fit of our model with the log response and the R\^2 value for the residuals of our plot being an Adjusted R-squared value of 0.1483, showing that 14.83% of the variance in SalePrice is explained by our model. 
 
 The test of CI for B1 is of interest to us since an increase in average sales prices from 58.24 to 89.14 with 95 percent confidence is certainly notable given our data and residuals plot.\
 Another interesting aspect was our Adjusted R-squared value of 0.1482 showing that 14.82% of the variance in SalePrice is explained by the simple linear model, meaning our model explained a relatively small amount of the variance.
@@ -370,7 +370,7 @@ Other questions that we would like to ask about the data is whether the data can
 Also, another question of interest may be whether a transformation of the residuals plot by a function would impact the linearity and residuals of the plot.
 
 
-After checking the normality of our original model, we decided to take the log of our response variable to make the variance more constant. Then we performed several tests to check the significance of our variable, and see what it may predict or allow us to infer.
+After checking the normality of our original model, we decided to take the log of our response variable to make the variance more constant. Then we performed several tests to check the significance of our variable, and see waht it may predict or allow us to infer.
 
 Interesting feature: 
 
@@ -379,5 +379,3 @@ The conclusion we drew from the t-test for $\beta_1$ lines up with our expectati
 Our finding through the prediction interval at an x level that is the maximum(2096 square feet) of our finished basement area data is also interesting. The actual value of the log of the sale price of the house with a finished basement area of 2096 square feet is outside(greater than) the prediction interval we obtained using our model. It tells us it is very challenging to predict sale prices of houses that are extremely large (judged by its basement area), potentially some luxury properties, using a simple linear model as the one we built.
 
 Other questions that we would like to explore within the data is whether the response variable is influenced by other variables.
-
-
