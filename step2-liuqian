@@ -377,10 +377,14 @@ Other questions that we would like to ask about the data is whether the data can
 Also, another question of interest may be whether a transformation of the residuals plot by a function would impact the linearity and residuals of the plot.
 
 
-
+After checking the normality of our original model, we decided to take the log of our response variable to make the variance more constant. Then we performed several tests to check the significance of our variable, and see waht it may predict or allow us to infer.
 
 Interesting feature: 
 
 The conclusion we drew from the t-test for $\beta_1$ lines up with our expectation because we would expect the sale price of a house to be higher if it has a larger finished basement area. The t-test gives a very small p-value, which tells us that the correlation is statistically significant. 
 
 Our finding through the prediction interval at an x level that is the maximum(2096 square feet) of our finished basement area data is also interesting. The actual value of the log of the sale price of the house with a finished basement area of 2096 square feet is outside(greater than) the prediction interval we obtained using our model. It tells us it is very challenging to predict sale prices of houses that are extremely large (judged by its basement area), potentially some luxury properties, using a simple linear model as the one we built.
+
+Other questions that we would like to explore within the data is whether the response variable is influenced by other variables.
+
+
