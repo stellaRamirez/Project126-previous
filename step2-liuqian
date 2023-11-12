@@ -105,7 +105,7 @@ In the following section we attempted to do a log transformation on the response
 fit_BsmtFinSF1_log <- lm(log(SalePrice) ~ BsmtFinSF1, data = train2_500)
 ```
 
-##### Plot log transformed data \newline
+##### Plot Log Transformed data With a Fitted Linear Line \newline
 
 ```{r echo=F, fig.height=3, fig.cap="Model with the Log Transformation"}
 ggplot(data = train2_500, aes(x = BsmtFinSF1, y = log(SalePrice))) + 
@@ -171,16 +171,6 @@ confint(fit_BsmtFinSF1_log, 'BsmtFinSF1', level = 0.95)
 
 Interpretation: With 95% confidence, a 1 square foot increase in basement square feet is associated with an increase in average of the log of the sales prices between an estimated 0.0002866904 and 0.0004387075.
 
-#### Plot transformed with fitted linear line \newline
-
-```{r echo=F, fig.cap="Plot of BsmtFinSF1 and the Log of the Sale Price"}
-p <- ggplot(train2_500, aes(x = BsmtFinSF1, y = log(SalePrice))) + 
-  geom_point() +
-  labs(x = 'Finished Basement Area',
-       y = 'Log of Sale Price')
-
-p + geom_smooth(method = 'lm', formula = 'y ~ x', se = F)
-```
 
 #### Confidence interval for mean and individual response \newline
 
