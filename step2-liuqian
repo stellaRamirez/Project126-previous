@@ -75,7 +75,7 @@ summary(fit_BsmtFinSF1)
 
 ##### Assumption checks for the simple linear model \newline
 
-```{r, echo=F, fig.width=8, fig.height=3, fig.cap="Assumption and Linearity Checks"}
+```{r, echo=F, fig.width=8, fig.height=3, fig.cap="Residual vs. fitted and BsmtFinSF1"}
 # panel of residual plots(ORIGINAL MODEL)
 augment(fit_BsmtFinSF1, train2_500) %>%
   pivot_longer(cols = c(.fitted, BsmtFinSF1)) %>%
@@ -84,7 +84,9 @@ augment(fit_BsmtFinSF1, train2_500) %>%
   geom_point() +
   geom_hline(aes(yintercept = 0)) +
   geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
+```
 
+```{r echo=F, fig.width=8, fig.height=3, fig.cap="linearity Check"}
 #normality check (ORIGINAL MODEL)
 augment(fit_BsmtFinSF1, train2_500) %>%
   ggplot(aes(sample = .resid)) +
