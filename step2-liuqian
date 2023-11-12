@@ -60,7 +60,7 @@ Our alternative hypothesis is that BsmtFinSF1 and SalePrice are positively corre
 
 #### Simple Linear Model \newline
 
-```{r echo=F, fig.width=7, fig.height=4}
+```{r echo=F, fig.width=7, fig.height=4, fig.cap="Simple Linear Model with BsmtFinSF1 and SalePrice"}
 ggplot(data = train2_500, mapping = aes(x = BsmtFinSF1, y = SalePrice)) + 
   geom_point(alpha = 0.3) +
   labs(title="SalePrice vs. BsmtFinSF1") +
@@ -75,7 +75,7 @@ summary(fit_BsmtFinSF1)
 
 ##### Assumption checks for the simple linear model \newline
 
-```{r, echo=F, fig.width=8, fig.height=3}
+```{r, echo=F, fig.width=8, fig.height=3, fig.cap="Assumption and Linearity Checks"}
 # panel of residual plots(ORIGINAL MODEL)
 augment(fit_BsmtFinSF1, train2_500) %>%
   pivot_longer(cols = c(.fitted, BsmtFinSF1)) %>%
@@ -105,7 +105,7 @@ fit_BsmtFinSF1_log <- lm(log(SalePrice) ~ BsmtFinSF1, data = train2_500)
 
 ##### Plot log transformed data \newline
 
-```{r echo=F, fig.height=3}
+```{r echo=F, fig.height=3, fig.cap="Model with the Log Transformation"}
 ggplot(data = train2_500, aes(x = BsmtFinSF1, y = log(SalePrice))) + 
   geom_point(alpha = 0.3) +
   labs(title="Log of SalePrice vs. BsmtFinSF1") +
@@ -116,7 +116,7 @@ ggplot(data = train2_500, aes(x = BsmtFinSF1, y = log(SalePrice))) +
 
 ##### Assumption checks for log model \newline
 
-```{r, echo=F, fig.width = 8, fig.height = 3}
+```{r, echo=F, fig.width = 8, fig.height = 3, fig.cap="Assumption and Linearity Checks with the Log Model"}
 # panel of residual plots(LOG MODEL)
 augment(fit_BsmtFinSF1_log, train2_500) %>%
   pivot_longer(cols = c(.fitted, BsmtFinSF1)) %>%
@@ -171,7 +171,7 @@ Interpretation: With 95% confidence, a 1 square foot increase in basement square
 
 #### Plot transformed with fitted linear line \newline
 
-```{r echo=F}
+```{r echo=F, fig.cap="Plot of BsmtFinSF1 and the Log of the Sale Price"}
 p <- ggplot(train2_500, aes(x = BsmtFinSF1, y = log(SalePrice))) + 
   geom_point() +
   labs(x = 'Finished Basement Area',
@@ -186,7 +186,7 @@ p + geom_smooth(method = 'lm', formula = 'y ~ x', se = F)
 
 The following graph displays the mean of BsmtFinSF1(basement finished area), at which the following CI is calculated and the fitted value of response at the mean of BsmtFinSF1.
 
-```{r echo=F}
+```{r echo=F, fig.cap="Visualization of Mean Line"}
 x_bar <- train2_500 %>% select(BsmtFinSF1) %>% summarise(across(everything(), mean))
 
 train2_500 %>% 
@@ -237,7 +237,7 @@ x_pt <- x_pt_comp %>% select(BsmtFinSF1)
 
 In the following graph, the actual data point at x = 2096 is shown in blue and the fitted value of our model is shown in red.
 
-```{r echo=F}
+```{r echo=F, fig.cap="Visualization of the Prediction at an Interesting Point"}
 train2_500 %>% 
   pivot_longer(cols = BsmtFinSF1,
                names_to = 'variable',
@@ -339,7 +339,7 @@ pred_df_train_pr <- pred_df_train %>%
 pred_df_train_pr %>% head()
 ```
 
-```{r echo=F}
+```{r echo=F, fig.cap="Confidence and Prediction Bands"}
 # add uncertainty bands
 p + geom_ribbon(aes(ymin = ci.lwr, 
                   ymax = ci.upr, 
