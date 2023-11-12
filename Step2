@@ -29,54 +29,60 @@ train2 <- train1[,!(names(train1) %in% drop)]
 train2
 ```
 
-```{r}
+```{r echo=F}
 # randomly choose 500 observations
 set.seed(12345)
 train2_500 <- train2[sample(1:1460, 500, replace = FALSE),]
 ```
-#### Introduction
 
-Our data source is from: Anna Montoya, DataCanary. (2016). House Prices - Advanced Regression Techniques. Kaggle.Obtained from https://kaggle.com/competitions/house-prices-advanced-regression-techniques (https://kaggle.com/competitions/house-pricesadvanced-regression-techniques)
+#### Introduction \newline
+
+Our data source is from: Anna Montoya, DataCanary.
+(2016).House Prices - Advanced Regression Techniques.
+Kaggle.Obtained from <https://kaggle.com/competitions/house-prices-advanced-regression-techniques> ([https://kaggle.com/competitions/house-pricesadvanced-regression-techniques](https://kaggle.com/competitions/house-pricesadvanced-regression-techniques){.uri})
 
 The population that we are inferring our results on are all residential houses in Ames, Iowa.
 
-We are using the variables BsmtFinSF1 and SalePrice as our variables of interest. 
+We are using the variables BsmtFinSF1 and SalePrice as our variables of interest.
 The BsmtFinSF1 variable is our predictor variable that we will use for hypothesis testing and plotting.
 The BsmtFinSF1 variable refers to the basement finished area square feet in the overall housing data.
-The SalePrice variable refers to the property's sale price in dollars, and it is our response, or dependent, variable that is affected by BsmtFinSF1. 
+The SalePrice variable refers to the property's sale price in dollars, and it is our response, or dependent, variable that is affected by BsmtFinSF1.
 
 We first fitted a simple linear model, and after exploring the data and checking model assumptions, we did a log-transformation on our response variable in order to fit the model better.
 
-Hypothesis: Our hypothesis is based on the predictor variable, BsmtFinSF1, and the response variable, SalePrice. Our null hypothesis is that BsmtFinSF1 
-and SalePrice are not linearly correlated, beta_1 = 0. Our alternative hypothesis is that BsmtFinSF1 and SalePrice are positively correlated, beta_1 > 0.
+Hypothesis: Our hypothesis is based on the predictor variable, BsmtFinSF1, and the response variable, SalePrice.
+Our null hypothesis is that BsmtFinSF1 and SalePrice are not linearly correlated, $\beta_1 = 0$.
+Our alternative hypothesis is that BsmtFinSF1 and SalePrice are positively correlated, $\beta_1 > 0$.
 
-```{r}
+#### Simple Linear Model \newline
+
+```{r echo=F, fig.width=7, fig.height=4, fig.cap="Simple Linear Model with BsmtFinSF1 and SalePrice"}
 ggplot(data = train2_500, mapping = aes(x = BsmtFinSF1, y = SalePrice)) + 
   geom_point(alpha = 0.3) +
   labs(title="SalePrice vs. BsmtFinSF1") +
   xlab("BsmtFinSF1") + ylab("SalePrice")
 ```
 
-#### Linear Model
-```{r}
+```{r include=F, fig.width=7, fig.height=3}
 fit <- lm(SalePrice ~ ., train2_500)
 fit_BsmtFinSF1 <- lm(SalePrice ~ BsmtFinSF1, train2_500)
 summary(fit_BsmtFinSF1)
 ```
 
+##### Assumption checks for the simple linear model \newline
 
-```{r, echo = T, fig.width = 8, fig.height = 3}
-# panel of residual plots
+```{r, echo=F, fig.width=8, fig.height=3, fig.cap="Residual vs. fitted and BsmtFinSF1"}
+# panel of residual plots(ORIGINAL MODEL)
 augment(fit_BsmtFinSF1, train2_500) %>%
   pivot_longer(cols = c(.fitted, BsmtFinSF1)) %>%
   ggplot(aes(y = .resid, x = value)) +
   facet_wrap(~ name, scales = 'free_x') +
-  geom_point(alpha = 0.3) +
+  geom_point() +
   geom_hline(aes(yintercept = 0)) +
   geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
 ```
 
-```{r}
+```{r echo=F, fig.width=8, fig.height=3, fig.cap="Linearity Check"}
 #normality check (ORIGINAL MODEL)
 augment(fit_BsmtFinSF1, train2_500) %>%
   ggplot(aes(sample = .resid)) +
@@ -84,25 +90,33 @@ augment(fit_BsmtFinSF1, train2_500) %>%
   geom_qq_line()
 ```
 
-#### Log Model
+The residual vs. fitted plot showed some slight pattern(i.e. greater variance at the two ends and smaller variance in the middle), and the qq plot also showed a slightly curved line, so we decided to try log transforming our response variable SalePrice to get a more constant variance.
 
-```{r, echo = T}
+#### Log Model \newline
+
+In the following section we attempted to do a log transformation on the response variable, SalePrice, and fit the explanatory variable, BsmtFinSF1, linearly with the log transformed response.
+
+```{r echo=F}
 # fit log response
 fit_BsmtFinSF1_log <- lm(log(SalePrice) ~ BsmtFinSF1, data = train2_500)
 ```
 
-##### Plot log transformed data
-```{r}
-ggplot(data = train2_500, aes(x = BsmtFinSF1, y = log(SalePrice))) + 
+##### Plot Log Transformed data With a Fitted Linear Line \newline
+
+```{r echo=F, fig.height=3, fig.cap="Model with the Log Transformation"}
+p <- ggplot(data = train2_500, aes(x = BsmtFinSF1, y = log(SalePrice))) + 
   geom_point(alpha = 0.3) +
   labs(title="Log of SalePrice vs. BsmtFinSF1") +
   xlab("BsmtFinSF1") + 
   ylab("Log of SalePrice") +
   geom_smooth(method = "lm", formula = 'y ~ x', se = F)
+p
 ```
 
-```{r, echo = T, fig.width = 8, fig.height = 3}
-# panel of residual plots WITH log transformation
+##### Assumption checks for log model \newline
+
+```{r, echo=F, fig.width = 8, fig.height = 3, fig.cap="Residual vs. fitted and BsmtFinSF1, New Model"}
+# panel of residual plots(LOG MODEL)
 augment(fit_BsmtFinSF1_log, train2_500) %>%
   pivot_longer(cols = c(.fitted, BsmtFinSF1)) %>%
   ggplot(aes(y = .resid, x = value)) +
@@ -112,41 +126,60 @@ augment(fit_BsmtFinSF1_log, train2_500) %>%
   geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
 ```
 
-```{r}
-#normality check (WITH LOG MODEL)
+```{r echo=F, fig.width=8, fig.height=3, fig.cap="Linearity Check"}
+# normality check (LOG MODEL)
 augment(fit_BsmtFinSF1_log, train2_500) %>%
   ggplot(aes(sample = .resid)) +
   geom_qq() +
   geom_qq_line()
 ```
-#### t-test for beta_1
 
-```{r echo=FALSE}
-#finding p value
-summary(fit_BsmtFinSF1)$coef
+As we can see from the residual vs. fitted plot and qq plot for the log model, the log transformation makes the variance of the residuals more constant throughout our data set, and the qq plot fits a straight line much better after the log transformation.
+These tells us that the log transformed model meets the assumptions we made better, thus we decided to proceed with the log transformed model.
+
+#### T-test for beta_1 \newline
+
+We performed a t-test on the coefficient of BsmtFinSF1 in our linear model, $\beta_1$.
+
+Hypothesis: Our hypothesis is based on the predictor variable, BsmtFinSF1, and the response variable, SalePrice.
+Our null hypothesis is that BsmtFinSF1 and SalePrice are not linearly correlated, beta_1 = 0.
+Our alternative hypothesis is that BsmtFinSF1 and SalePrice are positively correlated, beta_1 \> 0.
+
+p value:
+
+```{r echo=F}
+# finding p value
+# summary(fit_BsmtFinSF1)$coef
 #with LOGGED model
 summary(fit_BsmtFinSF1_log)$coef
 ```
-We are doing a one sided test, so the p-value will be divided by 2. As a result, we get a very small p-value, 1.24e-19, which allows us to reject our null hypothesis that beta_1 = 0 and accept our alternative hypothesis that beta_1 > 0. Our conclusion from the t-test is that BsmtFinSF1 is positively correlated with the SalePrice. 
 
-#### confidence interval for beta_1(BsmtFinSF1)
+Conclusion: We are doing a one sided test, so the p-value will be divided by 2.
+As a result, we get a very small p-value, 1.205e-19, which allows us to reject our null hypothesis that $\beta_1 = 0$ and accept our alternative hypothesis that $\beta_1 > 0$.
+Our conclusion from the t-test is that BsmtFinSF1 is positively correlated with the log of the SalePrice.
+
+#### confidence interval for beta_1(BsmtFinSF1) \newline
+
+The confidence interval we computed for $\beta_1$ is:
+
 ```{r echo=FALSE}
-confint(fit_BsmtFinSF1, 'BsmtFinSF1', level = 0.95)
+#confint(fit_BsmtFinSF1, 'BsmtFinSF1', level = 0.95)
 #with LOGGED model
 confint(fit_BsmtFinSF1_log, 'BsmtFinSF1', level = 0.95)
 ```
 
-With 95% confidence, a 1 square foot increase in basement square feet is associated with an increase in average sales prices between an estimated 58.24 and 89.14.
+Interpretation: With 95% confidence, a 1 square foot increase in basement square feet is associated with an increase in average of the log of the sales prices between an estimated 0.0002866904 and 0.0004387075.
 
-With 95% confidence, a 1 square foot increase in basement square feet is associated with an increase in average of the log of the sales prices between an estimated 0.0002866904  and 0.0004387075. 
 
-#### Confidence interval for mean and individual response
+#### Confidence interval for mean and individual response \newline
 
-##### Confidence interval for mean 
+##### Confidence interval for mean \newline
 
-The following graph displays the line at which the following confidence interval is calculated.
+The following graph displays the mean of BsmtFinSF1(basement finished area), at which the following CI is calculated and the fitted value of response at the mean of BsmtFinSF1.
 
-```{r}
+```{r echo=F, fig.cap="Visualization of Mean Line"}
+x_bar <- train2_500 %>% select(BsmtFinSF1) %>% summarise(across(everything(), mean))
+
 train2_500 %>% 
   pivot_longer(cols = BsmtFinSF1,
                names_to = 'variable',
@@ -155,66 +188,90 @@ train2_500 %>%
   facet_wrap(~ variable, scales = 'free_x', nrow=1) +
   geom_point() +
   labs(x = '', y = 'SalePrice') +
-  geom_vline(data = pivot_longer(x_pt,
+  geom_vline(data = pivot_longer(x_bar,
                                   everything(),
                                   names_to= 'variable',
                                   values_to = 'value'),
               aes(xintercept = value),
-              color = 'blue')
+              color = 'blue') + 
+  geom_point(aes(x=445.662,y=12.0053 ),colour="red")
+
 ```
 
-```{r}
+Confidence interval:
+
+```{r echo=F}
 # confidence interval for the mean og model
-x_bar <- train2_500 %>% select(BsmtFinSF1) %>% summarise(across(everything(), mean))
-predict(fit_BsmtFinSF1, newdata = x_bar, interval = 'confidence', level = 0.95)
+# predict(fit_BsmtFinSF1, newdata = x_bar, interval = 'confidence', level = 0.95)
 
 # confidence interval for the mean with LOGGED MODEL
-x_bar <- train2_500 %>% select(BsmtFinSF1) %>% summarise(across(everything(), mean))
 predict(fit_BsmtFinSF1_log, newdata = x_bar, interval = 'confidence', level = 0.95)
 ```
-##### Prediction interval for individual response
-```{r}
+
+Interpretation: With 95% confidence, the mean of the log SalePrice for a house with basement area equal to the average in the data is estimated to be between 11.97263 and 12.03798.
+
+##### Confidence interval for individual response at an interesting x value
+
+We used the point with x(basement finished area) value of 2096 as our point of interest, because this is the largest basement finished area in the 500 observations we used and the point is an outlier in our data.
+
+```{r echo=F, eval=FALSE}
 #find point of interest
 max(train2_500$BsmtFinSF1)
 train2_500[175,'BsmtFinSF1']
 ```
-```{r}
+
+```{r echo=F}
 #store point
 x_pt_comp <- train2_500[175,'BsmtFinSF1']
 x_pt <- x_pt_comp %>% select(BsmtFinSF1)
-#remove from dataset
-train2_500 <- train2_500 %>% slice(-as.numeric(rownames(x_pt)))
+```
 
+In the following graph, the actual data point at x = 2096 is shown in blue and the fitted value of our model is shown in red.
 
+```{r echo=F, fig.cap="Visualization of the Prediction at an Interesting Point"}
+train2_500 %>% 
+  pivot_longer(cols = BsmtFinSF1,
+               names_to = 'variable',
+               values_to = 'value') %>%
+  ggplot(aes(x=value, y = log(SalePrice))) +
+  facet_wrap(~ variable, scales = 'free_x', nrow=1) +
+  geom_point() +
+  labs(x = '', y = 'SalePrice') +
+  geom_point(aes(x=2096,y=12.60388), colour="red", size=2) +
+  geom_point(aes(x=2096,y=13.52114), colour="blue", size=2)
+
+```
+
+Confidence interval:
+
+```{r echo=F}
 #prediction interval for a particular value og model
-predict(fit_BsmtFinSF1, newdata = x_pt, interval = 'prediction', level = 0.95)
+#predict(fit_BsmtFinSF1, newdata = x_pt, interval = 'prediction', level = 0.95)
 
 #prediction interval for a particular value with LOGGED MODEL
 predict(fit_BsmtFinSF1_log, newdata = x_pt, interval = 'prediction', level = 0.95)
 ```
 
+Interpretation: With 95% confidence, the predicted log of the SalePrice of a house with a finished basement area of 2096 square feet is estimated to be between 11.86181 and 13.34594.
 
-#### R^2
+Interesting feature: The actual value of the log of the sale price of the house with a finished basement area of 2096 square feet is outside(greater than) the prediction interval we obtained using our model.
+This is interesting because it tells us it is very challenging to predict sale prices of houses that are extremely large(judged by its basement area), potentially some luxury properties, using a simple linear model as the one we built.
 
-```{r}
-summary(fit_BsmtFinSF1)$adj.r.squared
+#### R\^2 \newline
+
+```{r echo=F}
+#summary(fit_BsmtFinSF1)$adj.r.squared
 #with LOGGED model
 summary(fit_BsmtFinSF1_log)$adj.r.squared
 ```
-Our model has an Adjusted R-squared value of 0.1482. This tells us that 14.82% of the variance in SalePrice is explained by our simple linear model with the explanatory variable basement finished area(BsmtFinSF1). This means our model explains only a relatively  small amount of the variance, but it is reasonable considering we are only using one variable. 
 
-#### Plot transformed with fit linear line and add confidence bands + prediction bands
+Our model has an Adjusted R-squared value of 0.1483.
+This tells us that 14.82% of the variance in SalePrice is explained by our simple linear model with the log transformation with the explanatory variable basement finished area(BsmtFinSF1).
+This means our model explains only a relatively small amount of the variance, but it is reasonable considering we are only using one variable.
 
-```{r}
-p <- ggplot(train2_500, aes(x = BsmtFinSF1, y = log(SalePrice))) + 
-  geom_point() +
-  labs(x = 'Finished Basement Area',
-       y = 'Log of Sale Price')
+#### Add confidence bands + prediction bands \newline
 
-p + geom_smooth(method = 'lm', formula = 'y ~ x', se = F)
-```
-
-```{r}
+```{r include=F}
 # prediction grid
 train2_500 %>% 
   data_grid(BsmtFinSF1 = BsmtFinSF1, 
@@ -226,19 +283,14 @@ train2_500 %>%
   head()
 ```
 
-```{r}
+```{r include=F}
 # store prediction grid
 pred_df_train <- train2_500 %>%
   data_grid(BsmtFinSF1 = BsmtFinSF1, .model = fit_BsmtFinSF1_log) %>%
   add_predictions(model = fit_BsmtFinSF1_log)
 ```
-This gives us the path: 
-```{r}
-# plot path
-p + geom_path(aes(y = pred), data = pred_df_train)
-```
 
-```{r}
+```{r include=F}
 # compute confidence limits
 predict(fit_BsmtFinSF1_log, 
         newdata = pred_df_train, 
@@ -247,7 +299,7 @@ predict(fit_BsmtFinSF1_log,
   head()
 ```
 
-```{r}
+```{r include=F}
 # compute PREDICTION limits
 predict(fit_BsmtFinSF1_log, 
         newdata = pred_df_train, 
@@ -256,7 +308,7 @@ predict(fit_BsmtFinSF1_log,
   head()
 ```
 
-```{r}
+```{r include=F}
 # add confidence limits
 pred_df_train_ci <- pred_df_train %>%
   cbind(ci = predict(fit_BsmtFinSF1_log, 
@@ -267,7 +319,7 @@ pred_df_train_ci <- pred_df_train %>%
 pred_df_train_ci %>% head()
 ```
 
-```{r}
+```{r include=F}
 # add prediction limits
 pred_df_train_pr <- pred_df_train %>%
   cbind(pr = predict(fit_BsmtFinSF1_log, 
@@ -278,7 +330,7 @@ pred_df_train_pr <- pred_df_train %>%
 pred_df_train_pr %>% head()
 ```
 
-```{r}
+```{r echo=F, fig.cap="Confidence and Prediction Bands"}
 # add uncertainty bands
 p + geom_ribbon(aes(ymin = ci.lwr, 
                   ymax = ci.upr, 
@@ -294,17 +346,25 @@ p + geom_ribbon(aes(ymin = ci.lwr,
               alpha = 0.3) +
     geom_smooth(method = 'lm', formula = 'y ~ x', se = F)
 ```
+As you can see from this graph, the prediction band is much wider than the confidence band. This is accurate because while the CI depends on the estimates, the prediction interval at a specific value is influenced by both the estimates and the variation in the response. It is also interesting to note that the values moving to the right of the graph have a wider interval, implying higher uncertainty. Following our analysis, this conclusion supports our suggestion that it may be difficult to use existing data to predict the Sale Price of very large properties.
+
+#### Conclusion \newline
+
+We have obtained the results of our hypothesis about whether we reject or fail to reject the hypothesis that $\beta_0=0$.
+We then checked the assumptions for linear regression, with the results being\
+Next, we computed the test and found the CI for B1, with the results being a 1 square foot increase in basement square feet being associated with an increase in average sales prices from 58.24 to 89.14 with 95 percent confidence.
+We then plotted our predictor variable with our response variable, with the CI for the mean and individual response being .
+We have done the log transformation to our model in order to better compare and fit our model, and to make our data as well as hypothesis testing more meaningful.
+
+We also have the fit of our model with the log response and the $R^2$ value for the residuals of our plot being an Adjusted R-squared value of 0.1483, showing that 14.83% of the variance in SalePrice is explained by our model. 
 
 
-Summary: We have obtained the results of our hypothesis about whether we reject or fail to reject the hypothesis that B0=0. 
-We then checked the assumptions for linear regression, with the results being  
-Next, we computed the test and found the CI for B1, with the results being a 1 square foot increase in basement square feet being associated with an increase in average sales prices from 58.24 to 89.14 with 95 percent confidence. 
-We then plotted our predictor variable with our response variable, with the CI for the mean and individual response being . 
-We have done the log transformation to our model in order to better compare and fit our model, and to make our data as well as hypothesis testing more meaningful. 
-We also have the fit of our model and the R^2 value for the residuals of our plot being an Adjusted R-squared value of 0.1482. 
-The test of CI for B1 is of interest to us since an increase in average sales prices from 58.24 to 89.14 with 95 percent confidence is certainly notable given our data and residuals plot.  
-Another interesting aspect was our Adjusted R-squared value of 0.1482 showing that 14.82% of the variance in SalePrice is explained by the simple linear model, meaning our model explained a relatively small amount of the variance. 
-This is interesting information to us given the nature of our regression model as a single variable model, giving us validation that we were in the right direction.   
-The data we obtained were mostly what we expected to get since the plot turned out to be along our expectations. 
-Other questions that we would like to ask about the data is whether the data can be influenced by other variables. 
-Also, another question of interest may be whether a transformation of the residuals plot by a function would impact the linearity and residuals of the plot. 
+After checking the normality of our original model, we decided to take the log of our response variable to make the variance more constant. Then we performed several tests to check the significance of our variable, and see waht it may predict or allow us to infer.
+
+Interesting feature: 
+
+The conclusion we drew from the t-test for $\beta_1$ lines up with our expectation because we would expect the sale price of a house to be higher if it has a larger finished basement area. The t-test gives a very small p-value, which tells us that the correlation is statistically significant. 
+
+Our finding through the prediction interval at an x level that is the maximum(2096 square feet) of our finished basement area data is also interesting. The actual value of the log of the sale price of the house with a finished basement area of 2096 square feet is outside(greater than) the prediction interval we obtained using our model. It tells us it is very challenging to predict sale prices of houses that are extremely large (judged by its basement area), potentially some luxury properties, using a simple linear model as the one we built.
+
+Other questions that we would like to explore within the data is whether the response variable is influenced by other variables.
