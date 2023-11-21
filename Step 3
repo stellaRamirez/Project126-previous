@@ -37,3 +37,8 @@ train2_test <- train2[1:100,]
 train2_400 <- train2_500[101:500,]
 ```
 
+Introduction: The variables of interest are the BsmtFinSF1 and the SalePrice. Our SalePrice variable would be our response variable and out 
+predictor variables would be the BsmtFinSF1. Our sample data comes from an original data source, which is the Anna Montoya, DataCanary.
+(2016).House Prices - Advanced Regression Techniques. It is from Kaggle and obtained from <https://kaggle.com/competitions/house-prices-advanced-regression-techniques> ([https://kaggle.com/competitions/house-pricesadvanced-regression-techniques](https://kaggle.com/competitions/house-pricesadvanced-regression-techniques){.uri}).
+From the sample data, we can know that the population we are inferring our results on are all residential houses in Ames, Iowa.
+We will be inferring and analysing our plots from the two variables of interest that we have.
