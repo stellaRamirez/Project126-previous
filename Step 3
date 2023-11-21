@@ -1,1 +1,39 @@
+---
+title: "Step-3"
+author: "Liuqian Bao"
+date: "2023-11-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("skimr")
+library("dplyr")
+options(max.print=1000000)
+library(readxl)
+library(ggplot2)
+# load packages
+library(tidyverse)
+library(tidymodels)
+library(modelr)
+train <- read_excel("C:/Users/baoli/Desktop/PSTAT126/Project/house-prices-advanced-regression-techniques/train.xlsx") 
+```
+
+```{r include=FALSE}
+# Variable Selection
+train1 <- subset(train, select = -c(MSSubClass, OverallCond, BsmtFinSF2, LowQualFinSF, BsmtHalfBath, YrSold, MoSold, MiscVal, PoolArea, ScreenPorch, EnclosedPorch, KitchenAbvGr, BedroomAbvGr, Street, Alley, Utilities, LandSlope, RoofMatl, BsmtExposure, Heating, CentralAir, MiscFeature, Fence, PoolQC, LandContour,BldgType, Exterior2nd, GarageQual, GarageCond, PavedDrive, SaleType, SaleCondition, GrLivArea, OverallQual, TotalBsmtSF, WoodDeckSF, GarageArea, Fireplaces, TotRmsAbvGrd, MSZoning, Functional, MasVnrArea, GarageYrBlt, YearBuilt, YearRemodAdd))
+
+drop <- c("Condition1","Condition2", "3SsnPorch", "LotFrontage", "1stFlrSF", "2ndFlrSF")
+train2 <- train1[,!(names(train1) %in% drop)]
+train2
+```
+
+```{r echo=F}
+# randomly choose 500 observations
+set.seed(12345)
+train2_500 <- train2[sample(1:1460, 500, replace = FALSE),]
+# put aside a little bit of test data 
+train2_test <- train2[1:100,]
+train2_400 <- train2_500[101:500,]
+```
 
