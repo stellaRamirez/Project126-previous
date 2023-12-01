@@ -53,3 +53,39 @@ ggpairs(train4_500)
 # plot(pairplot[2,9])
 # plot(pairplot[2,10])
 ```
+## Computational Models
+First computational model: all of our quantitative variables.
+```{r}
+fitComp1 <- lm(log(SalePrice) ~ LotArea + GarageCars + BsmtFinSF1 + FullBath + OpenPorchSF + HalfBath, data = h2_partition$train)
+summary(fitComp1)
+```
+
+```{r, echo=F, fig.width=8, fig.height=8, fig.cap="Residual vs. fitted and BsmtFinSF1"}
+# panel of residual plots
+augment(fitComp1, h2_partition$train) %>%
+  pivot_longer(cols = c(.fitted, LotArea, GarageCars, BsmtFinSF1, FullBath, OpenPorchSF, HalfBath)) %>%
+  ggplot(aes(y = .resid, x = value)) +
+  facet_wrap(~ name, scales = 'free_x') +
+  geom_point() +
+  geom_hline(aes(yintercept = 0)) +
+  geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
+```
+
+We tranformed SalePrice with a log function to make the variance more constant. 
+
+Second computational model: we used GarageCars because it looked like it had high correlation, and KitchenQual becuase we wanted to test a highly correlated categorical variable. 
+
+```{r}
+fitComp2 <- lm(log(SalePrice) ~ GarageCars + KitchenQual, data = h2_partition$train)
+summary(fitComp2)
+```
+
+We tranformed SalePrice with a log function to make the variance more constant.
+
+## Anova to Cross Validate
+
+```{r}
+anova(fitComp1, fitComp2)
+```
+
+(we can also compare r^2 values)
