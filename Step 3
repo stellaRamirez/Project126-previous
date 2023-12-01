@@ -97,5 +97,10 @@ anova(fitComp1, fitComp2)
 model_null = lm(SalePrice ~ 1, data = h2_partition$train)
 model_full = lm(SalePrice ~ ., data = h2_partition$train)
 # need to specify the scope of models to be examined
-step(model_null, direction="forward", scope=list(upper=model_full, lower=model_null))
+stats::step(model_full, direction="backward", test="F")
 ```
+
+```{r}
+stats::step(model_null, direction="forward", scope=list(upper=model_full, lower=model_null))
+```
+
