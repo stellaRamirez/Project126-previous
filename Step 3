@@ -167,12 +167,22 @@ p_caseinf <- augment(fitTest, h2_partition$test) %>%
 p_caseinf
 ```
 
-```{r}
-unusual_obs <- augment(fitTest, h2_partition$test) %>% 
+```{r, echo = T}
+augment(fitTest, h2_partition$test) %>% 
   pivot_longer(cols = c(.resid, .hat, .cooksd)) %>%
   group_by(name) %>%
-  slice_max(order_by = abs(value), n = 1) %>%
-  ungroup()
+  slice_max(order_by = abs(value), n = 1) %>% # play here
+  select(name, value)
+```
 
-p_caseinf + geom_point(data = unusual_obs, color = 'red')
+```{r, echo = T, fig.width = 8}
+augment(fitTest) #row 6 .hat, row 51 resid
+```
+
+#### Confidence Interval for Mean
+```{r}
+fitTest %>% confint() # coefficients
+```
+```{r}
+predict(fitTest, interval= 'confidence') # each value
 ```
