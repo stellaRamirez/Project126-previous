@@ -103,4 +103,76 @@ stats::step(model_full, direction="backward", test="F")
 ```{r}
 stats::step(model_null, direction="forward", scope=list(upper=model_full, lower=model_null))
 ```
+We performed both forward and backward selection, keeping the response as the log of SalePrice. We used the AIC as the criteria. The model returned will hace the predictors with the lowest AIC's. Each of these methods of selection returned the same model with 9 predictors, so we will use that as our statistical model.
 
+(Using his method from lecture)
+```{r, include=FALSE}
+library(leaps)
+out <- regsubsets(log(SalePrice) ~ ., data = h2_partition$train, # just like lm()
+method = 'seqrep', # search strategy
+nbest = 1, # how many models of each size?
+nvmax = 10) # maximum number of predictors
+
+summary(out)
+```
+
+### After Chose Model, fit it
+```{r}
+fitStat <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF + GarageFinish, data = h2_partition$train)
+summary(fitStat)
+```
+
+Looking at our R^2 value for this model shows that 78% of the variation in the response is explained by this model.
+
+The following shows the residual plots we investigated to ensure that taking the log of the response helps with the model assumptions. 
+
+```{r, echo=F, fig.width=8, fig.height=8, fig.cap="Residual vs. fitted and BsmtFinSF1"}
+# panel of residual plots
+augment(fitStat, h2_partition$train) %>%
+  pivot_longer(cols = c(.fitted, LotArea, GarageCars, BsmtFinSF1, HalfBath, FullBath, OpenPorchSF)) %>%
+  ggplot(aes(y = .resid, x = value)) +
+  facet_wrap(~ name, scales = 'free_x') +
+  geom_point() +
+  geom_hline(aes(yintercept = 0)) +
+  geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
+```
+
+### Reporting on Test Data
+
+```{r}
+fitTest <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF + GarageFinish, data = h2_partition$test)
+summary(fitTest)
+```
+### Looking for Influence points
+
+```{r}
+augment(fitTest, h2_partition$test) %>%
+  mutate(obs_index = row_number()) %>%
+  ggplot(aes(x=obs_index, y = .resid)) +
+  geom_point() +
+  geom_hline(aes(yintercept = 0)) + # add line at zero
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.25)) # rotates and aligns labels
+```
+```{r, echo = T, fig.width = 10, fig.height = 8}
+p_caseinf <- augment(fitTest, h2_partition$test) %>%
+  pivot_longer(cols = c(.resid, .hat, .cooksd)) %>%
+  mutate(obs_index = row_number()) %>%
+  ggplot(aes(x=obs_index, y = value)) +
+  facet_wrap(~ name, scales = 'free_y', nrow = 3) + # looks better with vertical faceting
+  geom_point() +
+  geom_hline(aes(yintercept = 0)) + # add line at zero
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.25)) + # rotates and aligns labels
+  labs(x = '', y = '') 
+
+p_caseinf
+```
+
+```{r}
+unusual_obs <- augment(fitTest, h2_partition$test) %>% 
+  pivot_longer(cols = c(.resid, .hat, .cooksd)) %>%
+  group_by(name) %>%
+  slice_max(order_by = abs(value), n = 1) %>%
+  ungroup()
+
+p_caseinf + geom_point(data = unusual_obs, color = 'red')
+```
