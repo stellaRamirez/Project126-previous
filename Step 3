@@ -38,9 +38,11 @@ h3_500 <- subset(h2_500, select = c(SalePrice, LotArea, GarageCars, BsmtFinSF1, 
 h4_500 <- subset(h2_500, select = c(HouseStyle, OpenPorchSF, HalfBath, KitchenQual, GarageFinish)) ##pairplot
 ```
 
+#### Introduction
+
 ```{r}
-ggpairs(train3_500)
-ggpairs(train4_500)
+#ggpairs(train3_500)
+#ggpairs(train4_500)
 
 # plot(pairplot[2,1])
 # plot(pairplot[2,2])
@@ -53,14 +55,20 @@ ggpairs(train4_500)
 # plot(pairplot[2,9])
 # plot(pairplot[2,10])
 ```
-## Computational Models
-First computational model: all of our quantitative variables.
-```{r}
+#### Computational Models
+
+##### 1: 
+
+For our first computational model, we chose to fit a model with all of our quantitative variables. 
+
+```{r echo=FALSE}
 fitComp1 <- lm(log(SalePrice) ~ LotArea + GarageCars + BsmtFinSF1 + FullBath + OpenPorchSF + HalfBath, data = h2_partition$train)
 summary(fitComp1)
 ```
 
-```{r, echo=F, fig.width=8, fig.height=8, fig.cap="Residual vs. fitted and BsmtFinSF1"}
+In the following Graphs, we plotted the residuals for each variable to assess the model fit. We performed this twice, concluding that it is necessary to take the log of the response in order to correct the constant variance assumption. We have omitted the graphs of the un-transformed model, opting to display those of the model more useful to us.
+
+```{r, echo=F, fig.width=8, fig.height=8, fig.cap="Residual Graphs for Quantitative Variables"}
 # panel of residual plots
 augment(fitComp1, h2_partition$train) %>%
   pivot_longer(cols = c(.fitted, LotArea, GarageCars, BsmtFinSF1, FullBath, OpenPorchSF, HalfBath)) %>%
@@ -70,44 +78,54 @@ augment(fitComp1, h2_partition$train) %>%
   geom_hline(aes(yintercept = 0)) +
   geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
 ```
+\newpage
+##### Normality Check for Computational Model 1: \newline
+Then, we performed a normality check, to make sure the model was adequate.
 
-We tranformed SalePrice with a log function to make the variance more constant. 
+```{r, echo=FALSE, fig.width=4, fig.height=3}
+# normality check
+augment(fitComp1, h2_partition$train) %>%
+  ggplot(aes(sample = .resid)) +
+  geom_qq() +
+  geom_qq_line()
+```
 
-Second computational model: we used GarageCars because it looked like it had high correlation, and KitchenQual becuase we wanted to test a highly correlated categorical variable. 
+##### 2:
 
-```{r}
+For our second computational model, we used the variable GarageCars because it had high correlation, as seen in our beginning plots, and KitchenQual becuase we wanted to test a highly correlated categorical variable, in addition to quantitative.
+
+```{r echo=FALSE}
 fitComp2 <- lm(log(SalePrice) ~ GarageCars + KitchenQual, data = h2_partition$train)
 summary(fitComp2)
 ```
 
-We tranformed SalePrice with a log function to make the variance more constant.
+Again, we transformed SalePrice with a log function to make the variance more constant. Then we performed the following normality check on this model as well.
 
-## Anova to Cross Validate
+##### Normality Check for Computational Model 2 \newline
 
-```{r}
+```{r, echo=FALSE, fig.width=4, fig.height=3}
+# normality check
+augment(fitComp2, h2_partition$train) %>%
+  ggplot(aes(sample = .resid)) +
+  geom_qq() +
+  geom_qq_line()
+```
+
+#### Cross Analyzing the Two Computational Models
+
+##### Anova Function to Cross Validate
+
+```{r echo=FALSE}
 anova(fitComp1, fitComp2)
 ```
 
 (we can also compare r^2 values)
 
 
-#### Statistical model
+#### Statistical Model \newline
 
-```{r}
-model_null = lm(SalePrice ~ 1, data = h2_partition$train)
-model_full = lm(SalePrice ~ ., data = h2_partition$train)
-# need to specify the scope of models to be examined
-stats::step(model_full, direction="backward", test="F")
-```
-
-```{r}
-stats::step(model_null, direction="forward", scope=list(upper=model_full, lower=model_null))
-```
-We performed both forward and backward selection, keeping the response as the log of SalePrice. We used the AIC as the criteria. The model returned will hace the predictors with the lowest AIC's. Each of these methods of selection returned the same model with 9 predictors, so we will use that as our statistical model.
-
-(Using his method from lecture)
 ```{r, include=FALSE}
-library(leaps)
+library(leaps) # this is using his method from lexture, probably won't include in final report
 out <- regsubsets(log(SalePrice) ~ ., data = h2_partition$train, # just like lm()
 method = 'seqrep', # search strategy
 nbest = 1, # how many models of each size?
@@ -116,17 +134,35 @@ nvmax = 10) # maximum number of predictors
 summary(out)
 ```
 
-### After Chose Model, fit it
-```{r}
+Next, we used backward selection to assess which variables would be best to use in our model. To do so, we begin with a full model and subtract the predictors one at a time.
+
+```{r echo=FALSE}
+model_null = lm(SalePrice ~ 1, data = h2_partition$train)
+model_full = lm(SalePrice ~ ., data = h2_partition$train)
+# need to specify the scope of models to be examined
+stats::step(model_full, direction="backward", test="F")
+```
+After doing so, we decided to also try forward selection to assess which variables would be best to use in our model. To do so, we begin with an empty model and add the predictors one at a time.
+
+```{r echo=FALSE}
+stats::step(model_null, direction="forward", scope=list(upper=model_full, lower=model_null))
+```
+In order to perform these two types of selection, keeping the response as the log of SalePrice, we used the AIC as the criteria. The model returned will have the predictors with the lowest AIC's. Both of these methods of selection returned the same model with 9 predictors, so we will use that as our statistical model.
+
+
+The following displays the summary of our fitted statistical model. As you can see, the variables chosen were ExterQual, LotArea, GarageCars, BsmtFinSF1, HalfBath, FullBath, KitchenQual, OpenPorchSF, and GarageFinish. 
+```{r echo=FALSE}
 fitStat <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF + GarageFinish, data = h2_partition$train)
 summary(fitStat)
 ```
+
 
 Looking at our R^2 value for this model shows that 78% of the variation in the response is explained by this model.
 
 The following shows the residual plots we investigated to ensure that taking the log of the response helps with the model assumptions. 
 
-```{r, echo=F, fig.width=8, fig.height=8, fig.cap="Residual vs. fitted and BsmtFinSF1"}
+\newpage
+```{r, echo=F, fig.width=8, fig.height=8, fig.cap="Residual Graphs for the Statistical Model"}
 # panel of residual plots
 augment(fitStat, h2_partition$train) %>%
   pivot_longer(cols = c(.fitted, LotArea, GarageCars, BsmtFinSF1, HalfBath, FullBath, OpenPorchSF)) %>%
@@ -137,13 +173,35 @@ augment(fitStat, h2_partition$train) %>%
   geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
 ```
 
-### Reporting on Test Data
+##### Normality Check for Statistical Model \newline
+
+```{r echo=FALSE}
+# normality check
+augment(fitStat, h2_partition$train) %>%
+  ggplot(aes(sample = .resid)) +
+  geom_qq() +
+  geom_qq_line()
+```
+
+#### Reporting on Test Data \newline
+
+In the following section, we fit our test data with the linear model based on the predictors chosen from our selection process.
 
 ```{r}
 fitTest <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF + GarageFinish, data = h2_partition$test)
 summary(fitTest)
 ```
-### Looking for Influence points
+Just in case, we performed a normality check to make sure the assumption holds within our test data. 
+
+```{r echo=FALSE}
+# normality check
+augment(fitTest, h2_partition$test) %>%
+  ggplot(aes(sample = .resid)) +
+  geom_qq() +
+  geom_qq_line()
+```
+
+#### Looking for Influence points
 
 ```{r}
 augment(fitTest, h2_partition$test) %>%
