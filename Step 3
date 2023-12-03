@@ -158,7 +158,7 @@ After doing so, we decided to also try forward selection to assess which variabl
 ```{r echo=FALSE, include=FALSE}
 stats::step(model_null, direction="forward", scope=list(upper=model_full, lower=model_null))
 ```
-The result of backward selection was a model including ExterQual, LotArea, GarageCars, BsmtFinSF1, HalfBath, FullBath, KitchenQual, and OpenPorchSF.
+The result of forward selection was a model including ExterQual, LotArea, GarageCars, BsmtFinSF1, HalfBath, FullBath, KitchenQual, and OpenPorchSF.
 
 In order to perform these two types of selection, keeping the response as the log of SalePrice, we used the AIC as the criteria. The model returned will have the predictors with the lowest AIC's. Both of these methods of selection returned the same model with 9 predictors, so we will use that as our statistical model.
 
