@@ -280,7 +280,7 @@ And here is the summary of the fit after they have been removed:
 summary(fitTest_removed)
 ```
 
-After removing the high leverage point at row 6 and the outlier point at row 51, we fit the selected model with 8 variables again. By comparing the summary of the two models, we found that the adjusted $R^2$ and the F statistics increased slightly, which makes sense because the model has a better fit without the usual observations. However, the estimated coefficients of the variables and their significance did not change a lot, which means that removing unusual observations does not drastically change the model. 
+After removing the high leverage point at row 6 and the outlier point at row 51, we fit the selected model with 8 variables again. By comparing the summary of the two models, we found that the adjusted $R^2$ and the F statistics increased slightly, which makes sense because the model has a better fit without the unusual observations. However, the estimated coefficients of the variables and their significance did not change a lot, which means that removing unusual observations does not drastically change the model. 
 
 #### Confidence Interval for Mean Response 
 
