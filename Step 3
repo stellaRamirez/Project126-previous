@@ -79,6 +79,7 @@ augment(fitComp1, h2_partition$train) %>%
   geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
 ```
 \newpage
+
 ##### Normality Check for Computational Model 1: \newline
 Then, we performed a normality check, to make sure the model was adequate.
 
