@@ -55,6 +55,10 @@ h4_500 <- subset(h2_500, select = c(HouseStyle, OpenPorchSF, HalfBath, KitchenQu
 # plot(pairplot[2,9])
 # plot(pairplot[2,10])
 ```
+By looking at the pairs plots, we found that:
+1. The explanatory variables FullBath and GarageCars are moderately correlated(Corr: 0.457***).
+2. The explanatory variables ExterQual(exterior quality) and BsmtFinSF1(basement finished area) are somewhat correlated (judged by their box plots).
+
 #### Computational Models
 
 ##### 1: 
