@@ -209,5 +209,6 @@ Due to the potential negative influence of the outlier on our overall model, we 
 Due to the diversity of our predictors, we do have some predictors that are categorial variables which contain various levels, and these categorial variables had distinctive influences on our model. 
 They also had influence for the mean of the confidence intervals we tested. Finally, we gave confidence intervals for a mean predicted value and a prediction interval for a future predicted value. 
 For both the confidence interval and the prediction interval, we used the predict function, and we have used the mean of our dataset through selecting some notable variables for our mean confidence interval. 
+For our mean confidence interval, we have used the variable ExterQual as "TA", the variable KitchenQual as "TA", and the variable GarageFinish as "Unf". The confidence inveral data for "TA", "TA", and "Unf", we have the fit as 11.8618, the lower bound as 11.80702, and the upper bound as 11.91658.
 The values we obtained from the confidence and prediction intervals were within our expectations in accordance with our model. 
 Overall, we believed that the model we chose we a good fit for our data in step 3 of our project.
