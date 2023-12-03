@@ -72,7 +72,7 @@ summary(fitComp1)
 
 In the following Graphs, we plotted the residuals for each variable to assess the model fit. We performed this twice, concluding that it is necessary to take the log of the response in order to correct the constant variance assumption. We have omitted the graphs of the un-transformed model, opting to display those of the model more useful to us.
 
-```{r, echo=F, fig.width=8, fig.height=8, fig.cap="Residual Graphs for Quantitative Variables"}
+```{r, echo=F, fig.width=8, fig.height=8, fig.cap="Residual Graphs for Quantitative Variables", warning=FALSE}
 # panel of residual plots
 augment(fitComp1, h2_partition$train) %>%
   pivot_longer(cols = c(.fitted, LotArea, GarageCars, BsmtFinSF1, FullBath, OpenPorchSF, HalfBath)) %>%
@@ -175,7 +175,7 @@ Looking at our R^2 value for this model shows that 78% of the variation in the r
 The following shows the residual plots we investigated to ensure that taking the log of the response helps with the model assumptions. 
 
 \newpage
-```{r, echo=F, fig.width=8, fig.height=8, fig.cap="Residual Graphs for the Statistical Model"}
+```{r, echo=F, fig.width=8, fig.height=8, fig.cap="Residual Graphs for the Statistical Model", warning=FALSE}
 # panel of residual plots
 augment(fitStat, h2_partition$train) %>%
   pivot_longer(cols = c(.fitted, LotArea, GarageCars, BsmtFinSF1, HalfBath, FullBath, OpenPorchSF)) %>%
@@ -194,6 +194,8 @@ augment(fitStat, h2_partition$train) %>%
   geom_qq() +
   geom_qq_line()
 ```
+
+\newpage
 
 #### Reporting on Test Data \newline
 
