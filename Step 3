@@ -194,6 +194,11 @@ x_bar$GarageFinish <- "Unf"
 predict(fitTest, newdata = x_bar, interval = 'confidence', level = 0.95)
 ```
 
+#### Prediction Interval At a Value
+```{r}
+x_point <- testDF[100, ]
+predict(fitTest, newdata = x_point , interval = 'prediction', level = 0.95)
+```
 
 For step 3 of our project, we first put aside test data and introduced the reader to our data source. 
 Before we started our analysis of the data, we created the pairs plot, and from the pairs plot, we concluded that the data have a moderate correlation. 
