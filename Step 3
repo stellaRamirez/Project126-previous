@@ -262,6 +262,7 @@ After investigation, we found that the data with the highest .hat value is locat
 #### Comparing models with and without the unusal observarions 
 
 ```{r echo=FALSE}
+h2_testDF <- as.data.frame(h2_partition$test)
 h2_testDF_removed <- h2_testDF[-c(6,51), ]
 fitTest_removed <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF + GarageFinish, data = h2_testDF_removed)
 summary(fitTest)
