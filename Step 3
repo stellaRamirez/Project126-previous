@@ -332,7 +332,7 @@ We have then created an ANOVA table to cross-validate these models.
 
 We are not using interaction variables, as there is not sufficient evidence showing that variables interact. 
 
-Next, we did statistical analysis to determine a good model. Keeping our response the log of SalePrice, we have performed forward and backward selection using AIC as our criteria. Both forward and backward selection returned us the same model that has the same 9 predictors, so we decided to use those to define our model. The variables chosen are ExterQual, LotArea, GarageCars, BsmtFinSF1, HalfBath, FullBath, KitchenQual, OpenPorchSF, and GarageFinish. 
+Next, we did statistical analysis to determine a good model. Keeping our response the log of SalePrice, we have performed forward and backward selection using AIC as our criteria. Both forward and backward selection returned us the same model that has the same 8 predictors, so we decided to use those to define our model. The variables chosen are ExterQual, LotArea, GarageCars, BsmtFinSF1, HalfBath, FullBath, KitchenQual, and OpenPorchSF. 
 
 After choosing our model, we have fit the model and looked at the corresponding R^2 value, which showed that 78% variation in the response was explained by the model we chose. 
 
@@ -342,7 +342,7 @@ Due to the potential influence of these points on our overall model, we have inv
 
 Finally, we computed a confidence interval for a mean predicted value and several prediction intervals for future predicted values at specific points. 
 
-For our confidence interval, it is important to note that for the categorical variables, we found the most commonly occurring values of each.  We have used the variable ExterQual as "TA", the variable KitchenQual as "TA", and the variable GarageFinish as "Unf". 
+For our confidence interval, it is important to note that for the categorical variables, we found the most commonly occurring values of each.  We have used the variable ExterQual as "TA", and the variable KitchenQual as "TA". 
 
 In the prediction intervals, we tested each of our leverage points in addition to a general point that followed the trend, in order to see if there was much difference. We found that these points will change the interval, however there is not a huge discrepancy. 
 
