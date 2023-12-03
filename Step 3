@@ -187,7 +187,7 @@ augment(fitStat, h2_partition$train) %>%
 
 In the following section, we fit our test data with the linear model based on the predictors chosen from our selection process.
 
-```{r}
+```{r echo=FALSE}
 fitTest <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF + GarageFinish, data = h2_partition$test)
 summary(fitTest)
 ```
