@@ -40,7 +40,7 @@ h4_500 <- subset(h2_500, select = c(HouseStyle, OpenPorchSF, HalfBath, KitchenQu
 
 #### Introduction
 
-```{r}
+```{r echo=FALSE, include=FALSE}
 #ggpairs(train3_500)
 #ggpairs(train4_500)
 
