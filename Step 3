@@ -263,13 +263,23 @@ augment(fitTest) #row 6 .hat, row 51 resid
 ```
 After investigation, we found that the data with the highest .hat value is located in row 6 of our test data, and the data with the highest .resid is located in the 51st row of our test data.
 
-#### Comparing Models With and Without the Unusal Observations 
+#### Comparing Models With and Without the Unusal Observations \newline
 
 ```{r echo=FALSE}
 h2_testDF <- as.data.frame(h2_partition$test)
 h2_testDF_removed <- h2_testDF[-c(6,51), ]
 fitTest_removed <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF, data = h2_testDF_removed)
+```
+
+Here is a summary of the fit including the influence points:
+
+```{r echo=FALSE}
 summary(fitTest)
+```
+
+And here is the summary of the fit after they have been removed:
+
+```{r echo=FALSE}
 summary(fitTest_removed)
 ```
 
