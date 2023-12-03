@@ -163,9 +163,9 @@ The result of backward selection was a model including ExterQual, LotArea, Garag
 In order to perform these two types of selection, keeping the response as the log of SalePrice, we used the AIC as the criteria. The model returned will have the predictors with the lowest AIC's. Both of these methods of selection returned the same model with 9 predictors, so we will use that as our statistical model.
 
 
-The following displays the summary of our fitted statistical model. As you can see, the variables chosen were ExterQual, LotArea, GarageCars, BsmtFinSF1, HalfBath, FullBath, KitchenQual, OpenPorchSF, and GarageFinish. 
+The following displays the summary of our fitted statistical model. As you can see, the variables chosen were ExterQual, LotArea, GarageCars, BsmtFinSF1, HalfBath, FullBath, KitchenQual, and OpenPorchSF. 
 ```{r echo=FALSE}
-fitStat <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF + GarageFinish, data = h2_partition$train)
+fitStat <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF, data = h2_partition$train)
 summary(fitStat)
 ```
 
@@ -200,7 +200,7 @@ augment(fitStat, h2_partition$train) %>%
 In the following section, we fit our test data with the linear model based on the predictors chosen from our selection process.
 
 ```{r echo=FALSE}
-fitTest <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF + GarageFinish, data = h2_partition$test)
+fitTest <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF, data = h2_partition$test)
 summary(fitTest)
 ```
 Just in case, we performed a normality check to make sure the assumption holds within our test data. 
@@ -268,7 +268,7 @@ After investigation, we found that the data with the highest .hat value is locat
 ```{r echo=FALSE}
 h2_testDF <- as.data.frame(h2_partition$test)
 h2_testDF_removed <- h2_testDF[-c(6,51), ]
-fitTest_removed <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF + GarageFinish, data = h2_testDF_removed)
+fitTest_removed <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF, data = h2_testDF_removed)
 summary(fitTest)
 summary(fitTest_removed)
 ```
@@ -285,11 +285,9 @@ x_bar <- h2_testDF %>% select(c(LotArea, GarageCars, BsmtFinSF1, HalfBath, FullB
 # finding most frequent values for the categorical variables 
 #names(which.max(table(h2_testDF$ExterQual)))
 #names(which.max(table(h2_testDF$KitchenQual)))
-#names(which.max(table(h2_testDF$GarageFinish)))
 # use the most frequent values in the mean prediction 
 x_bar$ExterQual <- "TA"
 x_bar$KitchenQual <- "TA"
-x_bar$GarageFinish <- "Unf"
 predict(fitTest, newdata = x_bar, interval = 'confidence', level = 0.95)
 ```
 
@@ -336,5 +334,5 @@ For our confidence interval, it is important to note that for the categorical va
 In the prediction intervals, we tested each of our leverage points in addition to a general point that followed the trend, in order to see if there was much difference. We found that these points will change the interval, however there is not a huge discrepancy. 
 
 The values we obtained from the confidence and prediction intervals were within our expectations in accordance with our model. 
-Overall, we believe that the model we chose is a good fit for our data. We can conclude from our analysis that the most significant predictors are external quality(ExterQual), LotArea, GarageCars, finished basement square footage (BsmtFinSF1), HalfBath, FullBath, kitchen quality (KitchenQual), open porch square footage (OpenPorchSF), and GarageFinish.
+Overall, we believe that the model we chose is a good fit for our data. We can conclude from our analysis that the most significant predictors are external quality(ExterQual), LotArea, GarageCars, finished basement square footage (BsmtFinSF1), HalfBath, FullBath, kitchen quality (KitchenQual), and open porch square footage (OpenPorchSF).
 
