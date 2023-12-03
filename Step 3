@@ -255,6 +255,16 @@ augment(fitTest) #row 6 .hat, row 51 resid
 ```
 After investigation, we found that the data with the highest .hat value is located in row 6 of our test data, and the data with the highest .resid is located in the 51st row of our test data.
 
+#### Comparing models with and without the unusal observarions 
+
+```{r}
+h2_testDF_removed <- h2_testDF[-c(6,51), ]
+fitTest_removed <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF + GarageFinish, data = h2_testDF_removed)
+summary(fitTest)
+summary(fitTest_removed)
+```
+
+After removing the high leverage point at row 6 and the outlier point at row 51, we fit the selected model with 9 variables again. By comparing the summary of the two models, we found that the adjusted $R^2$ and the F statistics increased slightly, which makes sense because the model has a better fit without the usual observations. However, the estimated coefficients of the variables and their significance did not change a lot, which means that removing unusual observations does not drastically change the model. 
 
 #### Confidence Interval for Mean Response 
 
