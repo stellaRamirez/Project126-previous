@@ -38,28 +38,23 @@ h3_500 <- subset(h2_500, select = c(SalePrice, LotArea, GarageCars, BsmtFinSF1, 
 h4_500 <- subset(h2_500, select = c(HouseStyle, OpenPorchSF, HalfBath, KitchenQual, GarageFinish)) ##pairplot
 ```
 
-#### Introduction
+#### Introduction \newline
+
+Our data source is from: Anna Montoya, DataCanary.
+(2016).House Prices - Advanced Regression Techniques.
+Kaggle.Obtained from <https://kaggle.com/competitions/house-prices-advanced-regression-techniques> ([https://kaggle.com/competitions/house-pricesadvanced-regression-techniques](https://kaggle.com/competitions/house-pricesadvanced-regression-techniques){.uri})
+
+The population that we are inferring our results on are all residential houses in Ames, Iowa.
+
+In this step, we did computational model building and statistical model building. First, we selected two models that are interesting to us manually and used ANOVA test and $R^2$ values to cross validate and determine the better model. Then, we used the step() function to automatically select an optimal with AIC and F-tests. After selecting a single best model, we fitted the test data and made prediction intervals using the optimal model. 
 
 ```{r echo=FALSE, include=FALSE}
 #ggpairs(train3_500)
 #ggpairs(train4_500)
-
-# plot(pairplot[2,1])
-# plot(pairplot[2,2])
-# plot(pairplot[2,3])
-# plot(pairplot[2,4])
-# plot(pairplot[2,5])
-# plot(pairplot[2,6])
-# plot(pairplot[2,7])
-# plot(pairplot[2,8])
-# plot(pairplot[2,9])
-# plot(pairplot[2,10])
 ```
 By looking at the pairs plots, we found that:
 1. The explanatory variables FullBath and GarageCars are moderately correlated(Corr: 0.457***).
 2. The explanatory variables ExterQual(exterior quality) and BsmtFinSF1(basement finished area) are somewhat correlated (judged by their box plots).
-
-#### Computational Models
 
 ##### 1: 
 
@@ -303,6 +298,8 @@ x_bar$KitchenQual <- "TA"
 predict(fitTest, newdata = x_bar, interval = 'confidence', level = 0.95)
 ```
 
+For a house with average LotArea, GarageCars, BsmtFinSF1(basement finished are), HalfBath, FullBath, OpenPorchSF(open porch area), typical/average exterior and kitchen quality, the log of the sale price is estimated to be between 11.90099 and 11.94638, with 95% confidence. 
+
 #### Prediction Interval At a Value 
 
 Finally, we computed prediction intervals for a few points. The first is at a randomly chosen row, row 100. The next two are rows 6 and 51, the points of influence.
@@ -315,6 +312,10 @@ predict(fitTest, newdata = x_InfluencePt1 , interval = 'prediction', level = 0.9
 x_InfluencePt2 <- h2_testDF[51, ]
 predict(fitTest, newdata = x_InfluencePt2 , interval = 'prediction', level = 0.95)
 ```
+For a house that is the leverage point in the observation, the log of the sale price is estimated to be between 11.3022  and 11.78406, with 95% confidence. 
+
+For a house that is the outlier in the observation, the log of the sale price is estimated to be between 11.59978   and 11.94441, with 95% confidence. 
+
 As you can see, the points of influence affect the prediction intervals slightly. 
 
 #### Conclusion
