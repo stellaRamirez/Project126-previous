@@ -259,7 +259,7 @@ augment(fitTest) #row 6 .hat, row 51 resid
 ```
 After investigation, we found that the data with the highest .hat value is located in row 6 of our test data, and the data with the highest .resid is located in the 51st row of our test data.
 
-#### Comparing models with and without the unusal observarions 
+#### Comparing Models With and Without the Unusal Observations 
 
 ```{r echo=FALSE}
 h2_testDF <- as.data.frame(h2_partition$test)
@@ -279,9 +279,9 @@ Next, we computed a confidence interval for the mean response.
 h2_testDF <- as.data.frame(h2_partition$test)
 x_bar <- h2_testDF %>% select(c(LotArea, GarageCars, BsmtFinSF1, HalfBath, FullBath, OpenPorchSF)) %>% summarise(across(everything(), mean))
 # finding most frequent values for the categorical variables 
-names(which.max(table(h2_testDF$ExterQual)))
-names(which.max(table(h2_testDF$KitchenQual)))
-names(which.max(table(h2_testDF$GarageFinish)))
+#names(which.max(table(h2_testDF$ExterQual)))
+#names(which.max(table(h2_testDF$KitchenQual)))
+#names(which.max(table(h2_testDF$GarageFinish)))
 # use the most frequent values in the mean prediction 
 x_bar$ExterQual <- "TA"
 x_bar$KitchenQual <- "TA"
