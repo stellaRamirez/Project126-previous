@@ -256,7 +256,7 @@ After investigation, we found that the data with the highest .hat value is locat
 
 Next, we computed a confidence interval for the mean response. 
 
-```{r}
+```{r echo=FALSE}
 h2_testDF <- as.data.frame(h2_partition$test)
 x_bar <- h2_testDF %>% select(c(LotArea, GarageCars, BsmtFinSF1, HalfBath, FullBath, OpenPorchSF)) %>% summarise(across(everything(), mean))
 # finding most frequent values for the categorical variables 
