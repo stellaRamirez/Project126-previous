@@ -261,7 +261,7 @@ After investigation, we found that the data with the highest .hat value is locat
 
 #### Comparing models with and without the unusal observarions 
 
-```{r}
+```{r echo=FALSE}
 h2_testDF_removed <- h2_testDF[-c(6,51), ]
 fitTest_removed <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF + GarageFinish, data = h2_testDF_removed)
 summary(fitTest)
@@ -302,20 +302,34 @@ predict(fitTest, newdata = x_InfluencePt2 , interval = 'prediction', level = 0.9
 ```
 As you can see, the points of influence affect the prediction intervals slightly. 
 
-For step 3 of our project, we first put aside test data and introduced the reader to our data source. 
-Before we started our analysis of the data, we created the pairs plot, and from the pairs plot, we concluded that the data have a moderate correlation. 
-For our model, we have used the log transformation in order to obtain better correlation and stronger, more reliable relationships with our explanatory variables by through the presence of a more constant variance. 
-We have then created an ANOVA table to cross-validate our data, and we are not using interaction variables. 
-Then we would choose two models that are of interest to us, which would be model_null and model_full. 
-Keeping our response the log of SalePrice, we have performed forward and backward selection using AIC as our criteria. 
-Both forward and backward selection returned us the same model that has the same 9 predictors, so we decided to use that as our model. 
+#### Conclusion
+
+For step 3 of our project, we first put aside test data and re-introduced the reader to our data source. 
+
+Before we started our analysis of the data through models, we created pairs plots, and from these, we concluded that the data have a moderate correlation. 
+
+For each of our models, we applied diagnostic techniques and transformed the response with the log function, in order to obtain a more constant variance. This allows us to view any correlation or relationships between our response and our explanatory variables better, with a more accurate model.
+
+We chose two computational models, one including all of our numerical variables and one that we based off of correlation, including a categorical variable. 
+
+We have then created an ANOVA table to cross-validate these models. 
+
+We are not using interaction variables, as there is not sufficient evidence showing that variables interact. 
+
+Next, we did statistical analysis to determine a good model. Keeping our response the log of SalePrice, we have performed forward and backward selection using AIC as our criteria. Both forward and backward selection returned us the same model that has the same 9 predictors, so we decided to use those to define our model. The variables chosen are ExterQual, LotArea, GarageCars, BsmtFinSF1, HalfBath, FullBath, KitchenQual, OpenPorchSF, and GarageFinish. 
+
 After choosing our model, we have fit the model and looked at the corresponding R^2 value, which showed that 78% variation in the response was explained by the model we chose. 
-In order to get better interpretation of the model, we created residual plots for our predictors to make sure that taking the log of our response SalePrice helps with our model assumptions.   
-We then fitted our model and then we looked for influence points. We used techniques including vertical faceting to make our models look better, and we concluded that from our plots, we can see an outlier point that is far apart from the rest of the data. 
-Due to the potential negative influence of the outlier on our overall model, we have fitted a model by removing unwanted data points and concluded that the new fitted model worked much better for the training and the test datasets. 
-Due to the diversity of our predictors, we do have some predictors that are categorial variables which contain various levels, and these categorial variables had distinctive influences on our model. 
-They also had influence for the mean of the confidence intervals we tested. Finally, we gave confidence intervals for a mean predicted value and a prediction interval for a future predicted value. 
-For both the confidence interval and the prediction interval, we used the predict function, and we have used the mean of our dataset through selecting some notable variables for our mean confidence interval. 
-For our mean confidence interval, we have used the variable ExterQual as "TA", the variable KitchenQual as "TA", and the variable GarageFinish as "Unf". The confidence inveral data for "TA", "TA", and "Unf", we have the fit as 11.8618, the lower bound as 11.80702, and the upper bound as 11.91658.
+
+We then fit our model on our test data and looked for influence points. To do so, we looked at the residual and hat matrix values. Those with high values in each respective category are influence points. 
+
+Due to the potential influence of these points on our overall model, we have investigated the fit when removing unwanted data points and without. We concluded that these points do have some impact on the fit of our model, however, they do not drastically change our results. 
+
+Finally, we computed a confidence interval for a mean predicted value and several prediction intervals for future predicted values at specific points. 
+
+For our confidence interval, it is important to note that for the categorical variables, we found the most commonly occurring values of each.  We have used the variable ExterQual as "TA", the variable KitchenQual as "TA", and the variable GarageFinish as "Unf". 
+
+In the prediction intervals, we tested each of our leverage points in addition to a general point that followed the trend, in order to see if there was much difference. We found that these points will change the interval, however there is not a huge discrepancy. 
+
 The values we obtained from the confidence and prediction intervals were within our expectations in accordance with our model. 
-Overall, we believed that the model we chose we a good fit for our data in step 3 of our project.
+Overall, we believe that the model we chose is a good fit for our data. We can conclude from our analysis that the most significant predictors are external quality(ExterQual), LotArea, GarageCars, finished basement square footage (BsmtFinSF1), HalfBath, FullBath, kitchen quality (KitchenQual), open porch square footage (OpenPorchSF), and GarageFinish.
+
