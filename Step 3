@@ -274,7 +274,7 @@ predict(fitTest, newdata = x_bar, interval = 'confidence', level = 0.95)
 
 Finally, we computed prediction intervals for a few points. The first is at a randomly chosen row, row 100. The next two are rows 6 and 51, the points of influence.
 
-```{r}
+```{r echo=FALSE}
 x_point <- h2_testDF[100, ]
 predict(fitTest, newdata = x_point , interval = 'prediction', level = 0.95)
 x_InfluencePt1 <- h2_testDF[6, ]
