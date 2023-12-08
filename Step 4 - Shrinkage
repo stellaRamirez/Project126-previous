@@ -26,7 +26,7 @@ library("dplyr")
 options(max.print=1000000)
 library(readxl)
 library(ggplot2)
-train <- read_excel("train.xlsx") 
+train <- read_excel("C:/Users/baoli/Desktop/PSTAT126/Project/house-prices-advanced-regression-techniques/train.xlsx")
 ```
 
 
