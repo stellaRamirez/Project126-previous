@@ -37,6 +37,14 @@ h1 <- subset(train, select = -c(MSSubClass, OverallCond, BsmtFinSF2, LowQualFinS
 h2 <- subset(train, select = c(SalePrice, LotArea, GarageCars, BsmtFinSF1, FullBath, ExterQual, HouseStyle, OpenPorchSF, HalfBath, KitchenQual, GarageFinish))
 ```
 
+```{r}
+require(MASS)
+#h2 <- scale((h2), center=TRUE, scale=FALSE)
+#h2 <- as.data.frame(h2)
+rgmod <- lm.ridge(SalePrice ~ ., h2, lambda = seq(0,100,len=100))
+matplot(rgmod$lambda, coef(rgmod), xlab = "lambda", ylab = "Beta hat", cex=0.8)
+```
+
 ####Check Eigen Decomposition of x^Tx:
 
 ```{r}
