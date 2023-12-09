@@ -39,24 +39,20 @@ Kaggle.Obtained from <https://kaggle.com/competitions/house-prices-advanced-regr
 
 The population that we are inferring our results on are all residential houses in Ames, Iowa.
 
-For step 4 of our project, we will execute ridge regression and LASSO on our dataset in order to construct the graph with both our observed response variable and our predicted response variable. 
+For step 4 of our project, we will execute ridge regression and LASSO on our dataset. First, we will investigate whether there may be collinearity issues. In order to reduce the errors this collinearity will cause, we need to shrink or even remove the irrelevant predictors. 
 
 
-```{r include=FALSE}
-# Variable Selection
-h1 <- subset(train, select = -c(MSSubClass, OverallCond, BsmtFinSF2, LowQualFinSF, BsmtHalfBath, YrSold, MoSold, MiscVal, PoolArea, ScreenPorch, EnclosedPorch, KitchenAbvGr, BedroomAbvGr, Street, Alley, Utilities, LandSlope, RoofMatl, BsmtExposure, Heating, CentralAir, MiscFeature, Fence, PoolQC, LandContour,BldgType, Exterior2nd, GarageQual, GarageCond, PavedDrive, SaleType, SaleCondition, GrLivArea, OverallQual, TotalBsmtSF, WoodDeckSF, GarageArea, Fireplaces, TotRmsAbvGrd, MSZoning, Functional, MasVnrArea, GarageYrBlt, YearBuilt, YearRemodAdd))
-
-h2 <- subset(train, select = c(SalePrice, LotArea, GarageCars, BsmtFinSF1, FullBath, ExterQual, HouseStyle, OpenPorchSF, HalfBath, KitchenQual, GarageFinish))
-```
+To detect collinearity, we created a pairwise correlation chart. Variables that have high correlation will have values closer to  positive or negative 1. 
 
 ```{r} 
-h2[,-c(1,6,7,10, 11)]
+#h2[,-c(1,6,7,10, 11)]
 round(cor(h2[,-c(1,6,7,10, 11)]),2)
 ```
+As you can see, a few of our variables have some correlation. While there aren't too many with extremely high correlation, it can still be beneficial to perform ridge and lasso regression in order to use a model that only uses the useful information. The goal is that, after standardization, the coefficient estimates will have a smaller variance.
 
 ## Ridge Regression
 
-In order to use the glmnet package, we need to ensure that our response is a vector of log(SalePrice), and our predictors are in the form of a data.matrix.
+Ridge Regression is a technique used that keeps all variables, but still helps to filter irrelevant information. We will be shrinking the size of the coefficients. In order to use the glmnet package, we need to ensure that our response is a vector of log(SalePrice), and our predictors are in the form of a data.matrix.
 
 ```{r}
 y <- log(h2$SalePrice)
@@ -67,7 +63,7 @@ x <- data.matrix(h2[, c('LotArea','GarageCars','BsmtFinSF1','FullBath','ExterQua
 
 Next, we use the glmnet package to fit a model for ridge regression. The glmnet function automatically standardizes our predictor variables. This standardization makes it so that the standard deviation of each variable is 1 and then mean is 0.
 
-```{r}
+```{r, echo=FALSE}
 library(glmnet)
 
 #fit ridge regression model
@@ -78,10 +74,10 @@ summary(model)
 ```
 ### Finding Optimal Lambda
 
-Next, we use cross validation to find the best lambda value. 
+Next, we use cross validation to find the best lambda value. In order to do this process, 1/10 of the data is tested at a time.
 
-```{r}
-#perform k-fold cross-validation to find optimal lambda value
+```{r, echo=FALSE}
+#perform 10-fold cross-validation to find optimal lambda value
 cv_model <- cv.glmnet(x, y, alpha = 0)
 
 #find optimal lambda value that minimizes test MSE
@@ -89,18 +85,19 @@ best_lambda <- cv_model$lambda.min
 best_lambda
 ```
 
+The optimal lambda found by cross-validation is 0.027.
 
-The following shows a plot testing the MSE with the lambda values.
+The following shows a plot of the test MSE with the $log(\lambda)$ values.
 
-```{r}
+```{r, echo=FALSE, fig.cap="MSE and log(lambda)"}
 #produce plot of test MSE by lambda value
 plot(cv_model) 
 ```
 
 
-Next, we view the estimates of the coefficients for this model.
+Next, we view the estimates of the coefficients for the best model.
 
-```{r}
+```{r, echo=FALSE}
 #find coefficients of best model
 best_model <- glmnet(x, y, alpha = 0, lambda = best_lambda)
 coef(best_model)
@@ -108,13 +105,13 @@ coef(best_model)
 
 So that we could explore ridge regression further, and view what happens as lambda increases, we created the following graph.
 
-```{r}
+```{r, echo=FALSE, fig.cap="Effect as Lambda Increases"}
 #Ridge trace plot
 plot(model, xvar = "lambda")
 ```
 Finally, we wanted to see what the $r^2$ value is for our ridge regression model. 
 
-```{r}
+```{r, echo=FALSE}
 #use fitted best model to make predictions
 y_predicted <- predict(model, s = best_lambda, newx = x)
 
@@ -135,9 +132,11 @@ This value of $r^2$ means that the best model possible, found as a result of rid
 
 ### Lasso Model
 
-We executed Lasso regression on the complete data set with the final MLR model from the previous project task.
+We executed Lasso regression on the complete data set with the final MLR model from the previous project task. With Lasso Regression, some of the $/beta$'s are shrunk all the way to zero. This will mean that the corresponding irrelevant predictor will not have influence in our model. 
 
-```{r}
+The following is a summary of our fitted lasso model.
+
+```{r, echo=FALSE}
 #fit lasso regression model
 model_lasso <- glmnet(x, y, alpha = 1)
 
@@ -147,9 +146,10 @@ summary(model_lasso)
 
 #### Finding Optimal Lambda
 
-We used cross validation to find the optimal lambda value that minimizes the mean squared error.
+Again, we used cross validation to find the optimal lambda value that minimizes the mean squared error with the Lasso method.
 
-```{r}
+```{r, echo=FALSE}
+set.seed(10)
 require(glmnet)
 y2 <- log(h2$SalePrice)
 x2 <- data.matrix(h2[,c("ExterQual", "LotArea", "GarageCars", "BsmtFinSF1", "HalfBath", "FullBath", "KitchenQual", "OpenPorchSF")])
@@ -159,11 +159,11 @@ best_lambda <- cv_model_lasso$lambda.min
 best_lambda
 ```
 
-The optimal $\lambda$ we found is 0.001232506, so we are going to tune our lasso model using this $\lambda$ value.
+The optimal $\lambda$ we found is 0.001123, so we are going to tune our lasso model using this $\lambda$ value.
 
 In the graph below we plotted $log(\lambda)$ agianst the mean squared error.
 
-```{r}
+```{r, echo=FALSE, fig.cap="MSE and log(lambda)"}
 plot(cv_model, cex=0.8)
 ```
 
@@ -171,7 +171,7 @@ plot(cv_model, cex=0.8)
 
 Next, we view the estimates of the coefficients for the lasso model.
 
-```{r}
+```{r, echo=FALSE}
 best_model_lasso <- glmnet(x2, y2, alpha = 1, lambda = best_lambda)
 coef(best_model_lasso)
 ```
@@ -182,8 +182,8 @@ In our case, no coefficient is shrunk all the way to zero, but the coefficients 
 
 In the graph below we plotted estimates of the coefficients of all the variables in the lasso model.
 
-```{r}
-plot(coef(best_model_lasso), type="h", xlab="index", ylab="Coefficient", cex=0.8)
+```{r, echo=FALSE, fig.cap="Coefficient Estimates"}
+plot(coef(best_model_lasso), type="h", xlab="Index", ylab="Coefficient", cex=0.8)
 ```
 
 We can see in the graph that the coefficients are very small for LotArea, BsmtFinSF1, and OpenPorchSF. 
