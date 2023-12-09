@@ -44,7 +44,7 @@ For step 4 of our project, we will execute ridge regression and LASSO on our dat
 
 To detect collinearity, we created a pairwise correlation chart. Variables that have high correlation will have values closer to  positive or negative 1. 
 
-```{r} 
+```{r, echo=FALSE}  
 #h2[,-c(1,6,7,10, 11)]
 round(cor(h2[,-c(1,6,7,10, 11)]),2)
 ```
