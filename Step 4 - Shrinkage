@@ -29,6 +29,7 @@ library(ggplot2)
 train <- read_excel("C:/Users/baoli/Desktop/PSTAT126/Project/house-prices-advanced-regression-techniques/train.xlsx")
 ```
 
+
 Introduction: 
 
 In this step, we will use data we have used for our previous steps and incorporate the shrinkage methods. 
@@ -54,7 +55,7 @@ As you can see, a few of our variables have some correlation. While there aren't
 
 Ridge Regression is a technique used that keeps all variables, but still helps to filter irrelevant information. We will be shrinking the size of the coefficients. In order to use the glmnet package, we need to ensure that our response is a vector of log(SalePrice), and our predictors are in the form of a data.matrix.
 
-```{r}
+```{r echo=FALSE}
 y <- log(h2$SalePrice)
 x <- data.matrix(h2[, c('LotArea','GarageCars','BsmtFinSF1','FullBath','ExterQual','OpenPorchSF','HalfBath', 'KitchenQual')])
 ```
@@ -72,6 +73,7 @@ model <- glmnet(x, y, alpha = 0)
 #view summary of model
 summary(model)
 ```
+
 ### Finding Optimal Lambda
 
 Next, we use cross validation to find the best lambda value. In order to do this process, 1/10 of the data is tested at a time.
@@ -89,11 +91,10 @@ The optimal lambda found by cross-validation is 0.027.
 
 The following shows a plot of the test MSE with the $log(\lambda)$ values.
 
-```{r, echo=FALSE, fig.cap="MSE and log(lambda)"}
+```{r, echo=FALSE, fig.cap="MSE and log(lambda)(Ridge model)"}
 #produce plot of test MSE by lambda value
 plot(cv_model) 
 ```
-
 
 Next, we view the estimates of the coefficients for the best model.
 
@@ -105,10 +106,11 @@ coef(best_model)
 
 So that we could explore ridge regression further, and view what happens as lambda increases, we created the following graph.
 
-```{r, echo=FALSE, fig.cap="Effect as Lambda Increases"}
+```{r, echo=FALSE, fig.cap="Effect on coefficients as Lambda Increases(Ridge model)"}
 #Ridge trace plot
 plot(model, xvar = "lambda")
 ```
+
 Finally, we wanted to see what the $r^2$ value is for our ridge regression model. 
 
 ```{r, echo=FALSE}
@@ -124,15 +126,13 @@ rsq <- 1 - sse/sst
 rsq
 ```
 
-This value of $r^2$ means that the best model possible, found as a result of ridge regression, explains 71.32% of the variation in the response.
+This value of $r^2$ means that the best model possible, found as a result of ridge regression, explains 75.18% of the variation in the response.
 
-
-
-
-
-### Lasso Model
+## Lasso Regression
 
 We executed Lasso regression on the complete data set with the final MLR model from the previous project task. With Lasso Regression, some of the $\beta$'s are shrunk all the way to zero. This will mean that the corresponding irrelevant predictor will not have influence in our model. 
+
+### Fit Lasso Model
 
 The following is a summary of our fitted lasso model.
 
@@ -144,7 +144,20 @@ model_lasso <- glmnet(x, y, alpha = 1)
 summary(model_lasso)
 ```
 
-#### Finding Optimal Lambda
+In the graph below we plotted $log(\lambda)$ against the mean squared error.
+
+```{r, echo=FALSE, fig.cap="MSE and log(lambda)(Lasso model)"}
+plot(cv_model, cex=0.8)
+```
+
+So that we could explore lasso regression further, and view what happens as lambda increases, we created the following graph.
+
+```{r, echo=FALSE, fig.cap="Effect on coefficients as Lambda Increases(Lasso model)"}
+#Ridge trace plot
+plot(model, xvar = "lambda")
+```
+
+### Finding Optimal Lambda
 
 Again, we used cross validation to find the optimal lambda value that minimizes the mean squared error with the Lasso method.
 
@@ -161,13 +174,7 @@ best_lambda
 
 The optimal $\lambda$ we found is 0.001123, so we are going to tune our lasso model using this $\lambda$ value.
 
-In the graph below we plotted $log(\lambda)$ against the mean squared error.
-
-```{r, echo=FALSE, fig.cap="MSE and log(lambda)"}
-plot(cv_model, cex=0.8)
-```
-
-#### Find Coefficients of Best Model
+### Find Coefficients of Best Model
 
 Next, we view the estimates of the coefficients for the lasso model.
 
@@ -178,12 +185,29 @@ coef(best_model_lasso)
 
 In our case, no coefficient is shrunk all the way to zero, but the coefficients of LotArea, BsmtFinSF1, and OpenPorchSF are very close to zero, which means that they have close to no influence in our lasso model. 
 
-#### Plot Best Coefficients
+### Plot Best Coefficients
 
 In the graph below we plotted estimates of the coefficients of all the variables in the lasso model.
 
-```{r, echo=FALSE, fig.cap="Coefficient Estimates"}
+```{r, echo=FALSE, fig.cap="Coefficient Estimates(Lasso model)"}
 plot(coef(best_model_lasso), type="h", xlab="Index", ylab="Coefficient", cex=0.8)
 ```
 
 We can see in the graph that the coefficients are very small for LotArea, BsmtFinSF1, and OpenPorchSF. 
+
+Finally, we wanted to see what the $r^2$ value is for our lasso regression model. 
+
+```{r, echo=FALSE}
+#use fitted best model to make predictions
+y2_predicted <- predict(best_model_lasso, s = best_lambda, newx = x2)
+
+#find SST and SSE
+sst2 <- sum((y2 - mean(y2))^2)
+sse2 <- sum((y2_predicted - y2)^2)
+
+#find R-Squared
+rsq2 <- 1 - sse2/sst2
+rsq2
+```
+
+This value of $r^2$ means that the best model possible, found as a result of lasso regression, explains 71.39% of the variation in the response.
