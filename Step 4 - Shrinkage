@@ -29,6 +29,18 @@ library(ggplot2)
 train <- read_excel("C:/Users/baoli/Desktop/PSTAT126/Project/house-prices-advanced-regression-techniques/train.xlsx")
 ```
 
+Introduction: 
+
+In this step, we will use data we have used for our previous steps and incorporate the shrinkage methods. 
+
+The citation for our original data source is: Anna Montoya, DataCanary.
+(2016).House Prices - Advanced Regression Techniques.
+Kaggle.Obtained from <https://kaggle.com/competitions/house-prices-advanced-regression-techniques> ([https://kaggle.com/competitions/house-pricesadvanced-regression-techniques](https://kaggle.com/competitions/house-pricesadvanced-regression-techniques){.uri})
+
+The population that we are inferring our results on are all residential houses in Ames, Iowa.
+
+For step 4 of our project, we will execute ridge regression and LASSO on our dataset in order to construct the graph with both our observed response variable and our predicted response variable. 
+
 
 ```{r include=FALSE}
 # Variable Selection
