@@ -49,50 +49,82 @@ h1 <- subset(train, select = -c(MSSubClass, OverallCond, BsmtFinSF2, LowQualFinS
 h2 <- subset(train, select = c(SalePrice, LotArea, GarageCars, BsmtFinSF1, FullBath, ExterQual, HouseStyle, OpenPorchSF, HalfBath, KitchenQual, GarageFinish))
 ```
 
-```{r}
-require(MASS)
-#h2 <- scale((h2), center=TRUE, scale=FALSE)
-#h2 <- as.data.frame(h2)
-rgmod <- lm.ridge(SalePrice ~ ., h2, lambda = seq(0,100,len=100))
-matplot(rgmod$lambda, coef(rgmod), xlab = "lambda", ylab = "Beta hat", cex=0.8)
+```{r} 
+h2[,-c(1,6,7,10, 11)]
+round(cor(h2[,-c(1,6,7,10, 11)]),2)
 ```
 
-####Check Eigen Decomposition of x^Tx:
+## Ridge Regression
+
+In order to use the glmnet package, we need to ensure that our response is a vector of log(SalePrice), and our predictors are in the form of a data.matrix.
 
 ```{r}
-lmod <- lm(log(SalePrice) ~ ., h2)
-#summary(lmod)$coefficients
-x <- model.matrix(lmod)[,-1]
-lambda <- eigen(crossprod(x))$val
-sqrt(lambda[1]/lambda)
+y <- log(h2$SalePrice)
+x <- data.matrix(h2[, c('LotArea','GarageCars','BsmtFinSF1','FullBath','ExterQual','OpenPorchSF','HalfBath', 'KitchenQual')])
 ```
 
+### Fit Ridge Regression Model
 
-
-####Finding Optimal Lambda
+Next, we use the glmnet package to fit a model for ridge regression. The glmnet function automatically standardizes our predictor variables. This standardization makes it so that the standard deviation of each variable is 1 and then mean is 0.
 
 ```{r}
-require(glmnet)
-y <- h2$SalePrice
-x1 <- scale(data.matrix(h2[,-4]))
-cv_model <- cv.glmnet(x1, y, alpha = 1)
-#finding optimal lambda
+library(glmnet)
+
+#fit ridge regression model
+model <- glmnet(x, y, alpha = 0)
+
+#view summary of model
+summary(model)
+```
+### Finding Optimal Lambda
+
+Next, we use cross validation to find the best lambda value. 
+
+```{r}
+#perform k-fold cross-validation to find optimal lambda value
+cv_model <- cv.glmnet(x, y, alpha = 0)
+
+#find optimal lambda value that minimizes test MSE
 best_lambda <- cv_model$lambda.min
 best_lambda
 ```
 
-```{r}
-plot(cv_model, cex=0.8)
-```
-####Find Coefficients of Best Model
+
+The following shows a plot testing the MSE with the lambda values.
 
 ```{r}
-best_model <- glmnet(x1, y, alpha = 1, lambda = best_lambda)
+#produce plot of test MSE by lambda value
+plot(cv_model) 
+```
+
+
+Next, we view the estimates of the coefficients for this model.
+
+```{r}
+#find coefficients of best model
+best_model <- glmnet(x, y, alpha = 0, lambda = best_lambda)
 coef(best_model)
 ```
 
-####Plot Best Coefficients
+So that we could explore ridge regression further, and view what happens as lambda increases, we created the following graph.
 
 ```{r}
-plot(coef(best_model), type="h", xlab="index", ylab="Coefficient", cex=0.8)
+#Ridge trace plot
+plot(model, xvar = "lambda")
 ```
+Finally, we wanted to see what the $r^2$ value is for our ridge regression model. 
+
+```{r}
+#use fitted best model to make predictions
+y_predicted <- predict(model, s = best_lambda, newx = x)
+
+#find SST and SSE
+sst <- sum((y - mean(y))^2)
+sse <- sum((y_predicted - y)^2)
+
+#find R-Squared
+rsq <- 1 - sse/sst
+rsq
+```
+
+This value of $r^2$ means that the best model possible, found as a result of ridge regression, explains 71.32% of the variation in the response.
