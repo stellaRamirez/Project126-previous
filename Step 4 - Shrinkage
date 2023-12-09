@@ -138,7 +138,7 @@ This value of $r^2$ means that the best model possible, found as a result of rid
 We executed Lasso regression on the complete data set with the final MLR model from the previous project task.
 
 ```{r}
-#fit ridge regression model
+#fit lasso regression model
 model_lasso <- glmnet(x, y, alpha = 1)
 
 #view summary of model
