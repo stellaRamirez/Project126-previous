@@ -132,7 +132,7 @@ This value of $r^2$ means that the best model possible, found as a result of rid
 
 ### Lasso Model
 
-We executed Lasso regression on the complete data set with the final MLR model from the previous project task. With Lasso Regression, some of the $/beta$'s are shrunk all the way to zero. This will mean that the corresponding irrelevant predictor will not have influence in our model. 
+We executed Lasso regression on the complete data set with the final MLR model from the previous project task. With Lasso Regression, some of the $\beta$'s are shrunk all the way to zero. This will mean that the corresponding irrelevant predictor will not have influence in our model. 
 
 The following is a summary of our fitted lasso model.
 
