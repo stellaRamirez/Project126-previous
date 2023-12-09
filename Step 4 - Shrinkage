@@ -133,7 +133,7 @@ rsq <- 1 - sse/sst
 rsq
 ```
 
-This value of $r^2$ means that the best model possible, found as a result of ridge regression, explains 75.18% of the variation in the response.
+This value of $r^2$ means that the best model possible, found as a result of ridge regression, explains 71.32% of the variation in the response.
 
 ## Lasso Regression
 
@@ -175,8 +175,8 @@ y2 <- log(h2$SalePrice)
 x2 <- data.matrix(h2[,c("ExterQual", "LotArea", "GarageCars", "BsmtFinSF1", "HalfBath", "FullBath", "KitchenQual", "OpenPorchSF")])
 cv_model_lasso <- cv.glmnet(x2, y2, alpha = 1)
 #finding optimal lambda
-best_lambda <- cv_model_lasso$lambda.min
-best_lambda
+best_lambda2 <- cv_model_lasso$lambda.min
+best_lambda2
 ```
 
 The optimal $\lambda$ we found is 0.001123, so we are going to tune our lasso model using this $\lambda$ value.
@@ -206,7 +206,7 @@ Finally, we wanted to see what the $r^2$ value is for our lasso regression model
 
 ```{r, echo=FALSE}
 #use fitted best model to make predictions
-y2_predicted <- predict(best_model_lasso, s = best_lambda, newx = x2)
+y2_predicted <- predict(best_model_lasso, s = best_lambda2, newx = x2)
 
 #find SST and SSE
 sst2 <- sum((y2 - mean(y2))^2)
@@ -217,4 +217,4 @@ rsq2 <- 1 - sse2/sst2
 rsq2
 ```
 
-This value of $r^2$ means that the best model possible, found as a result of lasso regression, explains 71.39% of the variation in the response.
+This value of $r^2$ means that the best model possible, found as a result of lasso regression, explains 69.72% of the variation in the response.
