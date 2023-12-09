@@ -128,3 +128,54 @@ rsq
 ```
 
 This value of $r^2$ means that the best model possible, found as a result of ridge regression, explains 71.32% of the variation in the response.
+
+
+
+
+
+### Lasso Model
+
+We executed Lasso regression on the complete data set with the final MLR model from the previous project task.
+
+#### Finding Optimal Lambda
+
+We used cross validation to find the optimal lambda value that minimizes the mean squared error.
+
+```{r}
+require(glmnet)
+y2 <- log(h2$SalePrice)
+x2 <- data.matrix(h2[,c("ExterQual", "LotArea", "GarageCars", "BsmtFinSF1", "HalfBath", "FullBath", "KitchenQual", "OpenPorchSF")])
+cv_model_lasso <- cv.glmnet(x2, y2, alpha = 1)
+#finding optimal lambda
+best_lambda <- cv_model_lasso$lambda.min
+best_lambda
+```
+
+The optimal $\lambda$ we found is 0.001232506, so we are going to tune our lasso model using this $\lambda$ value.
+
+In the graph below we plotted $log(\lambda)$ agianst the mean squared error.
+
+```{r}
+plot(cv_model, cex=0.8)
+```
+
+#### Find Coefficients of Best Model
+
+Next, we view the estimates of the coefficients for the lasso model.
+
+```{r}
+best_model_lasso <- glmnet(x2, y2, alpha = 1, lambda = best_lambda)
+coef(best_model_lasso)
+```
+
+In our case, no coefficient is shrunk all the way to zero, but the coefficients of LotArea, BsmtFinSF1, and OpenPorchSF are very close to zero, which means that they have close to no influence in our lasso model. 
+
+#### Plot Best Coefficients
+
+In the graph below we plotted estimates of the coefficients of all the variables in the lasso model.
+
+```{r}
+plot(coef(best_model_lasso), type="h", xlab="index", ylab="Coefficient", cex=0.8)
+```
+
+We can see in the graph that the coefficients are very small for LotArea, BsmtFinSF1, and OpenPorchSF. 
