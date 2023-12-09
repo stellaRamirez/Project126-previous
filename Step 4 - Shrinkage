@@ -144,24 +144,14 @@ We executed Lasso regression on the complete data set with the final MLR model f
 The following is a summary of our fitted lasso model.
 
 ```{r, echo=FALSE}
+y2 <- log(h2$SalePrice)
+x2 <- data.matrix(h2[,c("ExterQual", "LotArea", "GarageCars", "BsmtFinSF1", "HalfBath", "FullBath", "KitchenQual", "OpenPorchSF")])
+
 #fit lasso regression model
-model_lasso <- glmnet(x, y, alpha = 1)
+model_lasso <- glmnet(x2, y2, alpha = 1)
 
 #view summary of model
 summary(model_lasso)
-```
-
-In the graph below we plotted $log(\lambda)$ against the mean squared error.
-
-```{r, echo=FALSE, fig.cap="MSE and log(lambda)(Lasso model)"}
-plot(cv_model, cex=0.8)
-```
-
-So that we could explore lasso regression further, and view what happens as lambda increases, we created the following graph.
-
-```{r, echo=FALSE, fig.cap="Effect on coefficients as Lambda Increases(Lasso model)"}
-#Ridge trace plot
-plot(model, xvar = "lambda")
 ```
 
 ### Finding Optimal Lambda
@@ -171,8 +161,6 @@ Again, we used cross validation to find the optimal lambda value that minimizes 
 ```{r, echo=FALSE}
 set.seed(10)
 require(glmnet)
-y2 <- log(h2$SalePrice)
-x2 <- data.matrix(h2[,c("ExterQual", "LotArea", "GarageCars", "BsmtFinSF1", "HalfBath", "FullBath", "KitchenQual", "OpenPorchSF")])
 cv_model_lasso <- cv.glmnet(x2, y2, alpha = 1)
 #finding optimal lambda
 best_lambda2 <- cv_model_lasso$lambda.min
@@ -181,22 +169,36 @@ best_lambda2
 
 The optimal $\lambda$ we found is 0.001123, so we are going to tune our lasso model using this $\lambda$ value.
 
+In the graph below we plotted $log(\lambda)$ against the mean squared error.
+
+```{r, echo=FALSE, fig.cap="MSE and log(lambda)(Lasso model)"}
+plot(cv_model_lasso, cex=0.8)
+```
+
+
 ### Find Coefficients of Best Model
 
 Next, we view the estimates of the coefficients for the lasso model.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=F}
 best_model_lasso <- glmnet(x2, y2, alpha = 1, lambda = best_lambda)
 coef(best_model_lasso)
 ```
 
 In our case, no coefficient is shrunk all the way to zero, but the coefficients of LotArea, BsmtFinSF1, and OpenPorchSF are very close to zero, which means that they have close to no influence in our lasso model. 
 
+So that we could explore lasso regression further, and view what happens as lambda increases, we created the following graph.
+
+```{r, echo=FALSE, fig.cap="Effect on coefficients as Lambda Increases(Lasso model)", warning=FALSE}
+#Lasso trace plot
+plot(model_lasso, xvar = "lambda")
+```
+
 ### Plot Best Coefficients
 
 In the graph below we plotted estimates of the coefficients of all the variables in the lasso model.
 
-```{r, echo=FALSE, fig.cap="Coefficient Estimates(Lasso model)"}
+```{r, echo=FALSE, fig.cap="Coefficient Estimates(Lasso model)", warning=FALSE}
 plot(coef(best_model_lasso), type="h", xlab="Index", ylab="Coefficient", cex=0.8)
 ```
 
