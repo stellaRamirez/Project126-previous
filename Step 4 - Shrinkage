@@ -194,6 +194,8 @@ So that we could explore lasso regression further, and view what happens as lamb
 plot(model_lasso, xvar = "lambda")
 ```
 
+\newpage
+
 ### Plot Best Coefficients
 
 In the graph below we plotted estimates of the coefficients of all the variables in the lasso model.
