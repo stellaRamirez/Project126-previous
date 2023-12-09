@@ -32,6 +32,7 @@ h2 <- subset(train, select = c(SalePrice, LotArea, GarageCars, BsmtFinSF1, FullB
 
 
 ```{r}
+#usual linear model, without the log transformation
 lmod <- lm(SalePrice ~ ., h2)
 plot(fitted(lmod), resid(lmod), xlab='Fitted Values', ylab='Residuals') + abline(0,0)
 ```
