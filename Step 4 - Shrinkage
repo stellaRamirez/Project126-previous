@@ -161,7 +161,7 @@ best_lambda
 
 The optimal $\lambda$ we found is 0.001123, so we are going to tune our lasso model using this $\lambda$ value.
 
-In the graph below we plotted $log(\lambda)$ agianst the mean squared error.
+In the graph below we plotted $log(\lambda)$ against the mean squared error.
 
 ```{r, echo=FALSE, fig.cap="MSE and log(lambda)"}
 plot(cv_model, cex=0.8)
