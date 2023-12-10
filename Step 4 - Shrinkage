@@ -226,6 +226,7 @@ This value of $r^2$ means that the best model possible, found as a result of las
 ## Graph MLR, RR, LASSO models in a singel graph
 
 ```{r echo=FALSE}
+# model in step 3 fitted on the whole dataset
 fitStatFull <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF, data = h2)
 ```
 
@@ -239,5 +240,6 @@ plot(x = log(h2$SalePrice), y = predict(fitStatFull),
      cex.lab = 0.9) 
 points(x = log(h2$SalePrice), y = y_predicted, col = "red", cex = 0.4)
 points(x = log(h2$SalePrice), y = y2_predicted, col = "blue", cex = 0.4)
+abline(0, 1)
 legend(13.1, 13.84, legend = c("MLR", "Ridge", "Lasso"), fill = c("green", "red", "blue"), cex = 0.8)
 ```
