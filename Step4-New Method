@@ -38,13 +38,13 @@ The analysis technique we have chosen to analyze is the method of weighted least
 
 First, we create our linear model in which we set SalePrice as the response. In the following graph, you can see that there is some fanning of our data points, showing that there is heteroscedasticity. 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.cap="Residual vs. fitted graph for linear model without log transformation"}
 #usual linear model, without the log transformation
 lmod <- lm(SalePrice ~ ., h2)
 plot(fitted(lmod), resid(lmod), xlab='Fitted Values', ylab='Residuals') + abline(0,0)
 ```
 
-#### Summary of Linear Model
+#### Summary of Linear Model \newline
 
 The following shows the summary of our linear model, before adding weights.
 
@@ -77,6 +77,9 @@ summary(wls_model)
 
 As you can see, with the weighted model, the residual standard error is 1.363, and the $r^2$ value is 75.01%. 
 
-#### Compare With and Without Weights
+#### Compare With and Without Weights \newline
 
 Comparing the summaries of lmod and wls_model, we observed changes in coefficient estimates, standard errors and $r^2$ values. Especially, the residual standard error shows a drastic change from the model without weights. This means that the values that are predicted with the weighted model are much more accurate and aligned with the actual observations. Also, because the $r^2$ value increased, we know that the weighted model is able to explain more of the variance in SalePrice.
+
+
+
