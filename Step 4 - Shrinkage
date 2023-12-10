@@ -222,3 +222,22 @@ rsq2
 ```
 
 This value of $r^2$ means that the best model possible, found as a result of lasso regression, explains 69.72% of the variation in the response.
+
+## Graph MLR, RR, LASSO models in a singel graph
+
+```{r echo=FALSE}
+fitStatFull <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF, data = h2)
+```
+
+```{r echo=FALSE}
+plot(x = log(h2$SalePrice), y = predict(fitStatFull), 
+     xlab = "Actual Value", 
+     ylab = "Predicted Value", 
+     col = "green", 
+     cex = 0.4, 
+     cex.axis = 0.8,
+     cex.lab = 0.9) 
+points(x = log(h2$SalePrice), y = y_predicted, col = "red", cex = 0.4)
+points(x = log(h2$SalePrice), y = y2_predicted, col = "blue", cex = 0.4)
+legend(13.1, 13.84, legend = c("MLR", "Ridge", "Lasso"), fill = c("green", "red", "blue"), cex = 0.8)
+```
