@@ -223,7 +223,7 @@ rsq2
 
 This value of $r^2$ means that the best model possible, found as a result of lasso regression, explains 69.72% of the variation in the response.
 
-## Graph MLR, RR, LASSO models in a singel graph
+## Graph MLR, RR, LASSO Models in a Single Graph
 
 ```{r echo=FALSE}
 # model in step 3 fitted on the whole dataset
