@@ -34,6 +34,8 @@ h2 <- subset(train, select = c(SalePrice, LotArea, GarageCars, BsmtFinSF1, FullB
 
 The analysis technique we have chosen to analyze is the method of weighted least squares. In the previous steps of our project, we explored residual plots and found that our data had heteroscedasticity, or unequal variance. In order to fix that, we took the log of our response variable. Another way in which this issue can be addressed is through weighted linear regression, or the method of weighted least squares. This method places weights on observations so that the ones with smaller error variance are more influential.
 
+In our research, we utilized the website "statology", specifically https://www.statology.org/weighted-least-squares-in-r/, for guidance in how to implement this method.
+
 ### Investigate Heteroscedasticity
 
 First, we create our linear model in which we set SalePrice as the response. In the following graph, you can see that there is some fanning of our data points, showing that there is heteroscedasticity. 
