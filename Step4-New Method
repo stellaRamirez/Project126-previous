@@ -38,7 +38,7 @@ The analysis technique we have chosen to analyze is the method of weighted least
 
 First, we create our linear model in which we set SalePrice as the response. In the following graph, you can see that there is some fanning of our data points, showing that there is heteroscedasticity. 
 
-```{r, echo=FALSE, fig.cap="Residual vs. fitted graph for linear model without log transformation"}
+```{r, echo=FALSE, fig.cap="Residual vs. Fitted Graph for Linear Model Without log Transformation"}
 #usual linear model, without the log transformation
 lmod <- lm(SalePrice ~ ., h2)
 plot(fitted(lmod), resid(lmod), xlab='Fitted Values', ylab='Residuals') + abline(0,0)
