@@ -67,7 +67,7 @@ wls_model <- lm(SalePrice ~ ., data = h2, weights=wt)
 ```
 
 
-#### View the Summary of the Model, Now with Weights
+#### View the Summary of the Model, Now with Weights \newline
 
 The following shows the summary of our model, with the weights.
 
