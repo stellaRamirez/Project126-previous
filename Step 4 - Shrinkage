@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(tidymodels)
 library(modelr)
-install.packages("glmnet")
+#install.packages("glmnet")
 library(glmnet)
 ```
 
@@ -37,7 +37,7 @@ h2 <- subset(train, select = c(SalePrice, LotArea, GarageCars, BsmtFinSF1, FullB
 ```
 
 
-Introduction: 
+## Introduction: 
 
 In this step, we will use data we have used for our previous steps and incorporate the shrinkage methods. 
 
@@ -223,7 +223,7 @@ rsq2
 
 This value of $r^2$ means that the best model possible, found as a result of lasso regression, explains 69.72% of the variation in the response.
 
-## Graph MLR, RR, LASSO models in a singel graph
+## Graph MLR, RR, LASSO models in a Single Graph
 
 The scatter plot below depicts the predicted vs. actual values for the statistical model we obtained in step3(labeled MLR), the ridge(labeled Ridge) and lasso(labeled Lasso) regression models we just obtained:
 
