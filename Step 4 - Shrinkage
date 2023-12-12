@@ -232,7 +232,7 @@ The scatter plot below depicts the predicted vs. actual values for the statistic
 fitStatFull <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF, data = h2)
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.cap="scatter plot of the predicted vs. actual values for MLR, Rridge, and Lasso Models"}
 plot(x = log(h2$SalePrice), y = predict(fitStatFull), 
      xlab = "Actual Value", 
      ylab = "Predicted Value", 
