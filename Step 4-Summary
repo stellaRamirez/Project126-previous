@@ -69,7 +69,7 @@ The following are two graphs we found the most informative:
 
 The scatterplot of SalePrice versus BsmtFinSF1 indicates a strong association between BsmtFinSF1 and SalePrice. When BsmtFinSF1 increases, there is a clear corresponding increase in SalePrice, as indicated by the tightly packed data points. We note that there is also a clustering of data points at the 0 value for BsmtFinSF1, suggesting many properties without finished basement space.
 
-```{r echo=FALSE, fig.width=6, fig.height=3}
+```{r echo=FALSE, fig.width=6, fig.height=3, fig.cap="Scatter plot of SalePrice($) against Basement Area(squared ft)"}
 ggplot(data = train2 , mapping = aes(x = BsmtFinSF1, y = SalePrice)) + 
   geom_point(alpha = 0.1) +
   labs(title="SalePrice vs. BsmtFinSF1") +
@@ -78,8 +78,7 @@ ggplot(data = train2 , mapping = aes(x = BsmtFinSF1, y = SalePrice)) +
 
 ### A Histogram Showing the Distribution of SalePrice
 
-
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.cap="Histogram of SalePrice($)"}
 hist(train2[["SalePrice"]], 
      breaks = 80, 
      col = 'lightgrey',
@@ -240,7 +239,7 @@ y2_predicted <- predict(best_model_lasso, s = best_lambda2, newx = x2)
 fitStatFull <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF, data = h2)
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.cap="scatter plot of the predicted vs. actual values for MLR, Rridge, and Lasso Models"}
 plot(x = log(h2$SalePrice), y = predict(fitStatFull), 
      xlab = "Actual Value", 
      ylab = "Predicted Value", 
