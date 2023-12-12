@@ -1,0 +1,261 @@
+---
+title: "Summary"
+author: "Liuqian Bao, Stella Ramirez, Andrew Cheng"
+date: "2023-12-11"
+output:
+  pdf_document: default
+  html_document: default
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# load packages
+library(tidyverse)
+library(tidymodels)
+library(modelr)
+#install.packages("glmnet")
+library(glmnet)
+```
+
+```{r, include=FALSE}
+library("skimr")
+library("dplyr")
+options(max.print=1000000)
+library(readxl)
+library(ggplot2)
+train <- read_excel("train.xlsx") 
+```
+
+```{r include=FALSE}
+# Variable Selection
+h1 <- subset(train, select = -c(MSSubClass, OverallCond, BsmtFinSF2, LowQualFinSF, BsmtHalfBath, YrSold, MoSold, MiscVal, PoolArea, ScreenPorch, EnclosedPorch, KitchenAbvGr, BedroomAbvGr, Street, Alley, Utilities, LandSlope, RoofMatl, BsmtExposure, Heating, CentralAir, MiscFeature, Fence, PoolQC, LandContour,BldgType, Exterior2nd, GarageQual, GarageCond, PavedDrive, SaleType, SaleCondition, GrLivArea, OverallQual, TotalBsmtSF, WoodDeckSF, GarageArea, Fireplaces, TotRmsAbvGrd, MSZoning, Functional, MasVnrArea, GarageYrBlt, YearBuilt, YearRemodAdd))
+
+
+train1 <- subset(train, select = -c(MSSubClass, OverallCond, BsmtFinSF2, LowQualFinSF, BsmtHalfBath, YrSold, MoSold, MiscVal, PoolArea, ScreenPorch, EnclosedPorch, KitchenAbvGr, BedroomAbvGr, Street, Alley, Utilities, LandSlope, RoofMatl, BsmtExposure, Heating, CentralAir, MiscFeature, Fence, PoolQC, LandContour,BldgType, Exterior2nd, GarageQual, GarageCond, PavedDrive, SaleType, SaleCondition, GrLivArea, OverallQual, TotalBsmtSF, WoodDeckSF, GarageArea, Fireplaces, TotRmsAbvGrd, MSZoning, Functional, MasVnrArea, GarageYrBlt, YearBuilt, YearRemodAdd))
+
+drop <- c("Condition1","Condition2", "3SsnPorch", "LotFrontage", "1stFlrSF", "2ndFlrSF")
+train2 <- train1[,!(names(train1) %in% drop)]
+train2
+
+h2 <- subset(train, select = c(SalePrice, LotArea, GarageCars, BsmtFinSF1, FullBath, ExterQual, HouseStyle, OpenPorchSF, HalfBath, KitchenQual, GarageFinish))
+
+# randomly choose 500 observations
+set.seed(12345)
+train2_500 <- train2[sample(1:1460, 500, replace = FALSE),]
+
+# randomly choose 500 observations
+h2_500 <- h2[sample(1:1460, 500, replace = FALSE),]
+h2_partition <- h2_500 %>% resample_partition(p = c(train = 0.7, test = 0.3)) ##fit model
+h3_500 <- subset(h2_500, select = c(SalePrice, LotArea, GarageCars, BsmtFinSF1, FullBath, ExterQual)) ##pairplot
+h4_500 <- subset(h2_500, select = c(HouseStyle, OpenPorchSF, HalfBath, KitchenQual, GarageFinish)) ##pairplot
+```
+
+## Introduction
+
+Throughout the quarter, we have investigated the housing Data from residential homes in Ames, Iowa, in an attempt to learn what influences the sale price of each property. Our response variable was therefore: SalePrice - the property's sale price in dollars. Originally, there were many predictor variables, both categorical and quantitative. However, as we worked, we used various methods to use only the most influencial variables, and to minimize the noise created by irrelevant information.
+
+The citation for our original data source is: Anna Montoya, DataCanary.
+(2016).House Prices - Advanced Regression Techniques.
+Kaggle.Obtained from <https://kaggle.com/competitions/house-prices-advanced-regression-techniques> ([https://kaggle.com/competitions/house-pricesadvanced-regression-techniques](https://kaggle.com/competitions/house-pricesadvanced-regression-techniques){.uri})
+
+In step 1, we explored each variable, attempting to understand clearly what we were investigating, and to have visuals of any potential correlation. 
+
+The following are two graphs we found the most informative:
+
+### The Scatterplot we Based Step 2 on: SalePrice vs BsmtFinSF1 \newline
+
+The scatterplot of SalePrice versus BsmtFinSF1 indicates a strong association between BsmtFinSF1 and SalePrice. When BsmtFinSF1 increases, there is a clear corresponding increase in SalePrice, as indicated by the tightly packed data points. We note that there is also a clustering of data points at the 0 value for BsmtFinSF1, suggesting many properties without finished basement space.
+
+```{r echo=FALSE, fig.width=6, fig.height=3}
+ggplot(data = train2 , mapping = aes(x = BsmtFinSF1, y = SalePrice)) + 
+  geom_point(alpha = 0.1) +
+  labs(title="SalePrice vs. BsmtFinSF1") +
+  xlab("BsmtFinSF1") + ylab("SalePrice")
+```
+
+### A Histogram Showing the Distribution of SalePrice
+
+
+```{r, echo=FALSE}
+hist(train2[["SalePrice"]], 
+     breaks = 80, 
+     col = 'lightgrey',
+     xlab = "SalePrice", 
+     ylab = "Number of Observations",
+     main = paste("Histogram of SalePrice"))
+```
+
+The distribution of SalePrice for properties in Ames, Iowa shows a very right-skewed shape, which implies that a significant number of houses have lower sale prices, and there are relatively fewer houses with very high sale prices. This may reflect income disparities or variations in property values within the area, with a concentration of less expensive homes and only a few high-end properties.
+
+## Next, Explore the Effect of One Variable
+
+Since we noticed that the finished basement square footage seemed to have a positive correlation to the sale price, we decided to fit a linear model with it as the predictor. After exploring the model assumptions, we found that in order to obtain a more constant variance, we needed to transform the response with a log function.
+
+The following graphics display the scatter plot of our predictor vs response, and a residual panel to check the model assumptions. Additionally, we checked a qqplot for normality, and saw that with the log transformation, the points closely follow the line.
+
+
+```{r echo=F}
+# fit log response
+fit_BsmtFinSF1_log <- lm(log(SalePrice) ~ BsmtFinSF1, data = train2_500)
+```
+
+```{r echo=F, fig.height=3, fig.cap="Model with the Log Transformation"}
+p <- ggplot(data = train2_500, aes(x = BsmtFinSF1, y = log(SalePrice))) + 
+  geom_point(alpha = 0.3) +
+  labs(title="Log of SalePrice vs. BsmtFinSF1") +
+  xlab("BsmtFinSF1") + 
+  ylab("Log of SalePrice") +
+  geom_smooth(method = "lm", formula = 'y ~ x', se = F)
+p
+```
+
+```{r, echo=F, fig.width = 8, fig.height = 3, fig.cap="Residual vs. fitted and BsmtFinSF1, Logged Model"}
+# panel of residual plots(LOG MODEL)
+augment(fit_BsmtFinSF1_log, train2_500) %>%
+  pivot_longer(cols = c(.fitted, BsmtFinSF1)) %>%
+  ggplot(aes(y = .resid, x = value)) +
+  facet_wrap(~ name, scales = 'free_x') +
+  geom_point() +
+  geom_hline(aes(yintercept = 0)) +
+  geom_smooth(method = 'loess', formula = 'y ~ x', se = F, span = 1)
+```
+
+```{r echo=F, fig.width=8, fig.height=3, fig.cap="Normality Check"}
+# normality check (LOG MODEL)
+augment(fit_BsmtFinSF1_log, train2_500) %>%
+  ggplot(aes(sample = .resid)) +
+  geom_qq() +
+  geom_qq_line()
+```
+\newpage
+
+Thus, we chose to proceed by logging the response in each model used. We performed a double t-test on the coefficient of BsmtFinSF1. As you can see, the resulting p value allows us to reject our null hypothesis($\beta_1 =0$) and accept our alternative hypothesis that $\beta_1 >0$, confirming that BsmtFinSF1 and SalePrice are positively correlated.
+
+```{r echo=F}
+# finding p value
+# summary(fit_BsmtFinSF1)$coef
+#with LOGGED model
+summary(fit_BsmtFinSF1_log)$coef
+```
+
+Because the goal is to view how our predictors change the sale price of a property, we constructed a confidence interval for the mean.
+
+The following graph offers a visualization of the mean line.
+
+```{r echo=F, fig.cap="Visualization of Mean Line"}
+x_bar <- train2_500 %>% select(BsmtFinSF1) %>% summarise(across(everything(), mean))
+
+train2_500 %>% 
+  pivot_longer(cols = BsmtFinSF1,
+               names_to = 'variable',
+               values_to = 'value') %>%
+  ggplot(aes(x=value, y = log(SalePrice))) +
+  facet_wrap(~ variable, scales = 'free_x', nrow=1) +
+  geom_point() +
+  labs(x = '', y = 'SalePrice') +
+  geom_vline(data = pivot_longer(x_bar,
+                                  everything(),
+                                  names_to= 'variable',
+                                  values_to = 'value'),
+              aes(xintercept = value),
+              color = 'blue') + 
+  geom_point(aes(x=445.662,y=12.0053 ),colour="red")
+
+```
+
+According to our test, we determined that with 95% confidence, the mean of the log SalePrice for a house with basement area equal to the average in the data is estimated to be between 11.97263 and 12.03798.
+
+However, the $r^2$ value of this model was only 14.83%, and thus not much of the variance in the log of SalePrice was explained. 
+
+Now that we'd explored how BsmtFinSF1 may affect the response when it is the sole predictor, we decided to construct a model that conveyed more information.
+
+## Constructing a More Accurate Model
+
+In order to investigate which predictors held the most relevance, we performed both backward and forward selection on our model, keeping the response as the log of SalePrice. 
+
+Each of these methods suggested that the variables with the most significance are external quality(ExterQual), LotArea, GarageCars,finished basement square footage (BsmtFinSF1), HalfBath, FullBath, kitchen quality (KitchenQual), andopen porch square footage (OpenPorchSF).
+
+Fitting this model to our data, we obtained the following summary:
+
+```{r echo=FALSE}
+fitTest <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF, data = h2_partition$test)
+summary(fitTest)
+```
+
+As you can see, 81.35% of the variation in SalePrice is explained with this model, and it is therefore a much better fit. 
+
+## Ensuring We Have Used Variables of Influence
+
+We performed both LASSO and Ridge Regression, attempting to ensure that none of these eight variables was irrelevant, or too closely correlated with another that it incorrectly estimated the response. 
+
+After using the optimal lambda values to find the best models, we constructed this graph to compare the three.
+
+```{r echo=FALSE}
+y <- log(h2$SalePrice)
+x <- data.matrix(h2[, c('LotArea','GarageCars','BsmtFinSF1','FullBath','ExterQual','OpenPorchSF','HalfBath', 'KitchenQual')])
+
+library(glmnet)
+
+#fit ridge regression model
+model <- glmnet(x, y, alpha = 0)
+
+#perform 10-fold cross-validation to find optimal lambda value
+cv_model <- cv.glmnet(x, y, alpha = 0)
+
+#find optimal lambda value that minimizes test MSE
+best_lambda <- cv_model$lambda.min
+
+#find coefficients of best model
+best_model <- glmnet(x, y, alpha = 0, lambda = best_lambda)
+
+y_predicted <- predict(model, s = best_lambda, newx = x)
+
+#LASSO DATA FOLLOWS
+y2 <- log(h2$SalePrice)
+x2 <- data.matrix(h2[,c("ExterQual", "LotArea", "GarageCars", "BsmtFinSF1", "HalfBath", "FullBath", "KitchenQual", "OpenPorchSF")])
+
+#fit lasso regression model
+model_lasso <- glmnet(x2, y2, alpha = 1)
+
+set.seed(10)
+require(glmnet)
+cv_model_lasso <- cv.glmnet(x2, y2, alpha = 1)
+#finding optimal lambda
+best_lambda2 <- cv_model_lasso$lambda.min
+
+best_model_lasso <- glmnet(x2, y2, alpha = 1, lambda = best_lambda)
+
+y2_predicted <- predict(best_model_lasso, s = best_lambda2, newx = x2)
+```
+
+
+
+
+
+```{r echo=FALSE}
+# model in step 3 fitted on the whole dataset
+fitStatFull <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF, data = h2)
+```
+
+```{r echo=FALSE}
+plot(x = log(h2$SalePrice), y = predict(fitStatFull), 
+     xlab = "Actual Value", 
+     ylab = "Predicted Value", 
+     col = "green", 
+     cex = 0.4, 
+     cex.axis = 0.8,
+     cex.lab = 0.9) 
+points(x = log(h2$SalePrice), y = y_predicted, col = "red", cex = 0.4)
+points(x = log(h2$SalePrice), y = y2_predicted, col = "blue", cex = 0.4)
+abline(0, 1)
+legend(13.1, 13.84, legend = c("MLR", "Ridge", "Lasso"), fill = c("green", "red", "blue"), cex = 0.8)
+```
+
+In summary, the MLR, Ridge, and Lasso models have R-squared values of 0.828, 0.7132, and 0.6972, respectively, suggesting that MLR achieves the best fit. However, by analyzing the predicted vs. response graph, Ridge and Lasso have lower variances in predictions and might generalize better to unseen data due to their reduced complexity. 
+
+## Conclusion
+
+In conclusion, we found that the most statistically significant variables from our dataset are external quality(ExterQual), LotArea, GarageCars,finished basement square footage (BsmtFinSF1), HalfBath, FullBath, kitchen quality (KitchenQual), andopen porch square footage (OpenPorchSF). Due to this conclusion, we suggest clients use these as factors to be considered when deciding which properties to invest in, or how to price a property for the market.
