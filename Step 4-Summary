@@ -253,6 +253,8 @@ abline(0, 1)
 legend(13.1, 13.84, legend = c("MLR", "Ridge", "Lasso"), fill = c("green", "red", "blue"), cex = 0.8)
 ```
 
+\newpage
+
 In summary, the MLR, Ridge, and Lasso models have R-squared values of 0.828, 0.7132, and 0.6972, respectively, suggesting that MLR achieves the best fit. However, by analyzing the predicted vs. response graph, Ridge and Lasso have lower variances in predictions and might generalize better to unseen data due to their reduced complexity. 
 
 ## Conclusion
