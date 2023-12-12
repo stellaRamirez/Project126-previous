@@ -255,5 +255,7 @@ The Lasso model (blue) is similar to Ridge but with some points deviating less f
 ### Conclusion \newline
 
 In summary, the MLR, Ridge, and Lasso models have R-squared values of 0.828, 0.7132, and 0.6972, respectively, suggesting that MLR achieves the best fit. However, by analyzing the predicted vs. response graph, Ridge and Lasso have lower variances in predictions and might generalize better to unseen data due to their reduced complexity. 
+The method really provided us a good way to work with our data, and the data provided us mostly with data that we expected.
 
 Some further queries we could investigate would be why the models seem to overestimate/underestimate when the response values are at the lower/higher extremes(as can be seen in the graph above). Also, it came to our surprise that the lasso regression model did not shrink any of our variables to zero, which could also be further investigated. 
+These further queries would be interesting things that we could explore about the data in the future. 
