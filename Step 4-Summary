@@ -260,3 +260,4 @@ In summary, the MLR, Ridge, and Lasso models have R-squared values of 0.828, 0.7
 ## Conclusion
 
 In conclusion, we found that the most statistically significant variables from our dataset are external quality(ExterQual), LotArea, GarageCars,finished basement square footage (BsmtFinSF1), HalfBath, FullBath, kitchen quality (KitchenQual), andopen porch square footage (OpenPorchSF). Due to this conclusion, we suggest clients use these as factors to be considered when deciding which properties to invest in, or how to price a property for the market.
+The clients who are invovled with the markets would find our dataset, and our findings from the dataset through the methods that we have used, to be helpful in their decision making process. Our overall data mostly follows our expectations for our data, and the methods that we have employed really helped us come to important conclusions of our dataset. 
