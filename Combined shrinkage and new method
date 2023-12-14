@@ -308,7 +308,7 @@ As you can see, with the weighted model, the residual standard error is 1.363, a
 
 \newpage
 
-#### Check assumptions of the Weighted Least Square Model
+#### Check assumptions of the Weighted Least Square Model \newline
 
 Since this method is used to address heteroscedasticity, we do not assume constant variance of the error terms in this model. However, we still need to check the other two assumptions in the OLS model, which are linearity and zero expectation of the error terms. We will do this by checking the resdual plots of the weghted model:
 
