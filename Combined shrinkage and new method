@@ -172,6 +172,8 @@ best_lambda2
 
 The optimal $\lambda$ we found is 0.001123, so we are going to tune our lasso model using this $\lambda$ value.
 
+\newpage
+
 In the graph below we plotted $log(\lambda)$ against the mean squared error.
 
 ```{r, echo=FALSE, fig.cap="MSE and log(lambda)(Lasso model)"}
@@ -189,6 +191,8 @@ coef(best_model_lasso)
 ```
 
 In our case, no coefficient is shrunk all the way to zero, but the coefficients of LotArea, BsmtFinSF1, and OpenPorchSF are very close to zero, which means that they have close to no influence in our lasso model. 
+
+\newpage 
 
 So that we could explore lasso regression further, and view what happens as lambda increases, we created the following graph.
 
@@ -214,7 +218,7 @@ rsq2
 
 This value of $r^2$ means that the best model possible, found as a result of lasso regression, explains 69.72% of the variation in the response.
 
-## Graph MLR, RR, LASSO models in a singel graph
+## Graph MLR, RR, LASSO Models in a Single Graph
 
 The scatter plot below depicts the predicted vs. actual values for the statistical model we obtained in step3(labeled MLR), the ridge(labeled Ridge) and lasso(labeled Lasso) regression models we just obtained:
 
@@ -243,6 +247,8 @@ The Ridge model(red) has a scatter that clusters closer to the identity line(y=x
 
 The Lasso model (blue) is similar to Ridge but with some points deviating less from the identity line, possibly due to increased shrinkage of the coefficients of some  of the variables.
 
+\newpage 
+
 ### Conclusion \newline
 
 In summary, the MLR, Ridge, and Lasso models have R-squared values of 0.828, 0.7132, and 0.6972, respectively, suggesting that MLR achieves the best fit. However, by analyzing the predicted vs. response graph, Ridge and Lasso have lower variances in predictions and might generalize better to unseen data due to their reduced complexity. 
@@ -250,7 +256,7 @@ In summary, the MLR, Ridge, and Lasso models have R-squared values of 0.828, 0.7
 Some further queries we could investigate would be why the models seem to overestimate/underestimate when the response values are at the lower/higher extremes(as can be seen in the graph above). Also, it came to our surprise that the lasso regression model did not shrink any of our variables to zero, which could also be further investigated. 
 
 
-## Innovation: Weighted least square \newline
+## Innovation: Weighted Least Square \newline
 
 The analysis technique we have chosen to analyze is the method of weighted least squares. In the previous steps of our project, we explored residual plots and found that our data had heteroscedasticity, or unequal variance. In order to fix that, we took the log of our response variable. Another way in which this issue can be addressed is through weighted linear regression, or the method of weighted least squares. This method places weights on observations so that the ones with smaller error variance are more influential.
 
@@ -261,8 +267,11 @@ First, we create our linear model in which we set SalePrice as the response. In 
 ```{r, echo=FALSE, fig.cap="Residual vs. fitted graph for linear model without log transformation"}
 #usual linear model, without the log transformation
 lmod <- lm(SalePrice ~ ., h2)
-plot(fitted(lmod), resid(lmod), xlab='Fitted Values', ylab='Residuals') + abline(0,0)
+plot(fitted(lmod), resid(lmod), xlab='Fitted Values', ylab='Residuals')
+abline(0,0)
 ```
+
+\newpage
 
 #### Summary of Linear Model \newline
 
@@ -299,7 +308,7 @@ As you can see, with the weighted model, the residual standard error is 1.363, a
 
 \newpage
 
-#### Check assumptions of the weghted least sqaure model
+#### Check assumptions of the Weighted Least Square Model
 
 Since this method is used to address heteroscedasticity, we do not assume constant variance of the error terms in this model. However, we still need to check the other two assumptions in the OLS model, which are linearity and zero expectation of the error terms. We will do this by checking the resdual plots of the weghted model:
 
