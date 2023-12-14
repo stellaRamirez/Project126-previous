@@ -87,6 +87,17 @@ summary(wls_model)
 
 As you can see, with the weighted model, the residual standard error is 1.363, and the $r^2$ value is 75.01%. 
 
+#### Check assumptions of the weghted least sqaure model
+
+Since this method is used to address heteroscedasticity, we do not assume constant variance of the error terms in this model. However, we still need to check the other two assumptions in the OLS model, which are linearity and zero expectation of the error terms. We will do this by checking the resdual plots of the weghted model:
+
+```{r, echo=FALSE, fig.cap="Residual vs. fitted graph for linear model without log transformation"}
+#weighted least square model
+plot(fitted(wls_model), resid(wls_model), xlab='Fitted Values', ylab='Residuals') + abline(0,0)
+```
+
+As we can see from the residual vs. fitted plot there is no notable patterns suggesting that the linearity assumption is violated. Also vast majority of the residuals spread evenly above and below the zero line so we can assume that the expectation of the error term is zero in this case. 
+
 #### Compare With and Without Weights \newline
 
 Comparing the summaries of lmod and wls_model, we observed changes in coefficient estimates, standard errors and $r^2$ values. Especially, the residual standard error shows a drastic change from the model without weights. This means that the values that are predicted with the weighted model are much more accurate and aligned with the actual observations. Also, because the $r^2$ value increased, we know that the weighted model is able to explain more of the variance in SalePrice.
