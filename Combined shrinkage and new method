@@ -1,0 +1,321 @@
+---
+title: "Step4 Shrinkage method and weighted least square regression"
+author: "Liuqian Bao, Stella Ramirez, Andrew Cheng"
+date: "2023-10-27"
+output:
+  pdf_document: default
+  html_document: default
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# load packages
+library(tidyverse)
+library(tidymodels)
+library(modelr)
+library(glmnet)
+```
+
+```{r, include=FALSE}
+library("skimr")
+library("dplyr")
+options(max.print=1000000)
+library(readxl)
+library(ggplot2)
+train <- read_excel("C:/Users/baoli/Desktop/PSTAT126/Project/house-prices-advanced-regression-techniques/train.xlsx")
+```
+
+
+```{r include=FALSE}
+# Variable Selection
+h1 <- subset(train, select = -c(MSSubClass, OverallCond, BsmtFinSF2, LowQualFinSF, BsmtHalfBath, YrSold, MoSold, MiscVal, PoolArea, ScreenPorch, EnclosedPorch, KitchenAbvGr, BedroomAbvGr, Street, Alley, Utilities, LandSlope, RoofMatl, BsmtExposure, Heating, CentralAir, MiscFeature, Fence, PoolQC, LandContour,BldgType, Exterior2nd, GarageQual, GarageCond, PavedDrive, SaleType, SaleCondition, GrLivArea, OverallQual, TotalBsmtSF, WoodDeckSF, GarageArea, Fireplaces, TotRmsAbvGrd, MSZoning, Functional, MasVnrArea, GarageYrBlt, YearBuilt, YearRemodAdd))
+
+h2 <- subset(train, select = c(SalePrice, LotArea, GarageCars, BsmtFinSF1, FullBath, ExterQual, HouseStyle, OpenPorchSF, HalfBath, KitchenQual, GarageFinish))
+```
+
+
+
+## Introduction: 
+
+In this step, we will use data we have used for our previous steps and incorporate the shrinkage methods. 
+
+The citation for our original data source is: Anna Montoya, DataCanary.
+(2016).House Prices - Advanced Regression Techniques.
+Kaggle.Obtained from <https://kaggle.com/competitions/house-prices-advanced-regression-techniques> ([https://kaggle.com/competitions/house-pricesadvanced-regression-techniques](https://kaggle.com/competitions/house-pricesadvanced-regression-techniques){.uri})
+
+The population that we are inferring our results on are all residential houses in Ames, Iowa.
+
+For step 4 of our project, we will execute ridge regression and LASSO on our dataset. First, we will investigate whether there may be collinearity issues. In order to reduce the errors this collinearity will cause, we need to shrink or even remove the irrelevant predictors. 
+
+
+To detect collinearity, we created a pairwise correlation chart. Variables that have high correlation will have values closer to  positive or negative 1. 
+
+```{r, echo=FALSE}  
+#h2[,-c(1,6,7,10, 11)]
+round(cor(h2[,-c(1,6,7,10, 11)]),2)
+```
+As you can see, a few of our variables have some correlation. While there aren't too many with extremely high correlation, it can still be beneficial to perform ridge and lasso regression in order to use a model that only uses the useful information. The goal is that, after standardization, the coefficient estimates will have a smaller variance.
+
+## Ridge Regression
+
+Ridge Regression is a technique used that keeps all variables, but still helps to filter irrelevant information. We will be shrinking the size of the coefficients. In order to use the glmnet package, we need to ensure that our response is a vector of log(SalePrice), and our predictors are in the form of a data.matrix.
+
+```{r echo=FALSE}
+y <- log(h2$SalePrice)
+x <- data.matrix(h2[, c('LotArea','GarageCars','BsmtFinSF1','FullBath','ExterQual','OpenPorchSF','HalfBath', 'KitchenQual')])
+```
+
+### Fit Ridge Regression Model
+
+Next, we use the glmnet package to fit a model for ridge regression. The glmnet function automatically standardizes our predictor variables. This standardization makes it so that the standard deviation of each variable is 1 and then mean is 0.
+
+```{r, echo=FALSE}
+library(glmnet)
+
+#fit ridge regression model
+model <- glmnet(x, y, alpha = 0)
+
+#view summary of model
+summary(model)
+```
+
+### Finding Optimal Lambda
+
+Next, we use cross validation to find the best lambda value. In order to do this process, 1/10 of the data is tested at a time.
+
+```{r, echo=FALSE}
+#perform 10-fold cross-validation to find optimal lambda value
+cv_model <- cv.glmnet(x, y, alpha = 0)
+
+#find optimal lambda value that minimizes test MSE
+best_lambda <- cv_model$lambda.min
+best_lambda
+```
+
+The optimal lambda found by cross-validation is 0.027.
+
+The following shows a plot of the test MSE with the $log(\lambda)$ values.
+
+```{r, echo=FALSE, fig.cap="MSE and log(lambda)(Ridge model)"}
+#produce plot of test MSE by lambda value
+plot(cv_model) 
+```
+
+Next, we view the estimates of the coefficients for the best model.
+
+```{r, echo=FALSE}
+#find coefficients of best model
+best_model <- glmnet(x, y, alpha = 0, lambda = best_lambda)
+coef(best_model)
+```
+
+So that we could explore ridge regression further, and view what happens as lambda increases, we created the following graph.
+
+```{r, echo=FALSE, fig.cap="Effect on coefficients as Lambda Increases(Ridge model)"}
+#Ridge trace plot
+plot(model, xvar = "lambda")
+```
+
+Finally, we wanted to see what the $r^2$ value is for our ridge regression model. 
+
+```{r, echo=FALSE}
+#use fitted best model to make predictions
+y_predicted <- predict(model, s = best_lambda, newx = x)
+
+#find SST and SSE
+sst <- sum((y - mean(y))^2)
+sse <- sum((y_predicted - y)^2)
+
+#find R-Squared
+rsq <- 1 - sse/sst
+rsq
+```
+
+This value of $r^2$ means that the best model possible, found as a result of ridge regression, explains 71.32% of the variation in the response.
+
+\newpage
+
+## Lasso Regression 
+
+We executed Lasso regression on the complete data set with the final MLR model from the previous project task. With Lasso Regression, some of the $\beta$'s are shrunk all the way to zero. This will mean that the corresponding irrelevant predictor will not have influence in our model. 
+
+### Fit Lasso Model
+
+The following is a summary of our fitted lasso model.
+
+```{r, echo=FALSE}
+y2 <- log(h2$SalePrice)
+x2 <- data.matrix(h2[,c("ExterQual", "LotArea", "GarageCars", "BsmtFinSF1", "HalfBath", "FullBath", "KitchenQual", "OpenPorchSF")])
+
+#fit lasso regression model
+model_lasso <- glmnet(x2, y2, alpha = 1)
+
+#view summary of model
+summary(model_lasso)
+```
+
+### Finding Optimal Lambda
+
+Again, we used cross validation to find the optimal lambda value that minimizes the mean squared error with the Lasso method.
+
+```{r, echo=FALSE}
+set.seed(10)
+require(glmnet)
+cv_model_lasso <- cv.glmnet(x2, y2, alpha = 1)
+#finding optimal lambda
+best_lambda2 <- cv_model_lasso$lambda.min
+best_lambda2
+```
+
+The optimal $\lambda$ we found is 0.001123, so we are going to tune our lasso model using this $\lambda$ value.
+
+In the graph below we plotted $log(\lambda)$ against the mean squared error.
+
+```{r, echo=FALSE, fig.cap="MSE and log(lambda)(Lasso model)"}
+plot(cv_model_lasso, cex=0.8)
+```
+
+
+### Find Coefficients of Best Model
+
+Next, we view the estimates of the coefficients for the lasso model.
+
+```{r, echo=FALSE, warning=F}
+best_model_lasso <- glmnet(x2, y2, alpha = 1, lambda = best_lambda)
+coef(best_model_lasso)
+```
+
+In our case, no coefficient is shrunk all the way to zero, but the coefficients of LotArea, BsmtFinSF1, and OpenPorchSF are very close to zero, which means that they have close to no influence in our lasso model. 
+
+So that we could explore lasso regression further, and view what happens as lambda increases, we created the following graph.
+
+```{r, echo=FALSE, fig.cap="Effect on coefficients as Lambda Increases(Lasso model)", warning=FALSE}
+#Lasso trace plot
+plot(model_lasso, xvar = "lambda")
+```
+
+Finally, we wanted to see what the $r^2$ value is for our lasso regression model. 
+
+```{r, echo=FALSE}
+#use fitted best model to make predictions
+y2_predicted <- predict(best_model_lasso, s = best_lambda2, newx = x2)
+
+#find SST and SSE
+sst2 <- sum((y2 - mean(y2))^2)
+sse2 <- sum((y2_predicted - y2)^2)
+
+#find R-Squared
+rsq2 <- 1 - sse2/sst2
+rsq2
+```
+
+This value of $r^2$ means that the best model possible, found as a result of lasso regression, explains 69.72% of the variation in the response.
+
+## Graph MLR, RR, LASSO models in a singel graph
+
+The scatter plot below depicts the predicted vs. actual values for the statistical model we obtained in step3(labeled MLR), the ridge(labeled Ridge) and lasso(labeled Lasso) regression models we just obtained:
+
+```{r echo=FALSE}
+# model in step 3 fitted on the whole dataset
+fitStatFull <- lm(log(SalePrice) ~ ExterQual + LotArea + GarageCars + BsmtFinSF1 + HalfBath + FullBath + KitchenQual + OpenPorchSF, data = h2)
+```
+
+```{r echo=FALSE, fig.cap="scatter plot of the predicted vs. actual values for MLR, Rridge, and Lasso Models"}
+plot(x = log(h2$SalePrice), y = predict(fitStatFull), 
+     xlab = "Actual Value", 
+     ylab = "Predicted Value", 
+     col = "green", 
+     cex = 0.4, 
+     cex.axis = 0.8,
+     cex.lab = 0.9) 
+points(x = log(h2$SalePrice), y = y_predicted, col = "red", cex = 0.4)
+points(x = log(h2$SalePrice), y = y2_predicted, col = "blue", cex = 0.4)
+abline(0, 1)
+legend(13.1, 13.84, legend = c("MLR", "Ridge", "Lasso"), fill = c("green", "red", "blue"), cex = 0.8)
+```
+
+The MLR model(green) shows a wider spread of predicted values, indicating higher variance in predictions.
+
+The Ridge model(red) has a scatter that clusters closer to the identity line(y=x), suggesting less variance in predictions. This is due to the trade-off between variance and bias that the ridge regression intends to optimize. 
+
+The Lasso model (blue) is similar to Ridge but with some points deviating less from the identity line, possibly due to increased shrinkage of the coefficients of some  of the variables.
+
+### Conclusion \newline
+
+In summary, the MLR, Ridge, and Lasso models have R-squared values of 0.828, 0.7132, and 0.6972, respectively, suggesting that MLR achieves the best fit. However, by analyzing the predicted vs. response graph, Ridge and Lasso have lower variances in predictions and might generalize better to unseen data due to their reduced complexity. 
+
+Some further queries we could investigate would be why the models seem to overestimate/underestimate when the response values are at the lower/higher extremes(as can be seen in the graph above). Also, it came to our surprise that the lasso regression model did not shrink any of our variables to zero, which could also be further investigated. 
+
+
+## Innovation: Weighted least square \newline
+
+The analysis technique we have chosen to analyze is the method of weighted least squares. In the previous steps of our project, we explored residual plots and found that our data had heteroscedasticity, or unequal variance. In order to fix that, we took the log of our response variable. Another way in which this issue can be addressed is through weighted linear regression, or the method of weighted least squares. This method places weights on observations so that the ones with smaller error variance are more influential.
+
+### Investigate Heteroscedasticity \newline
+
+First, we create our linear model in which we set SalePrice as the response. In the following graph, you can see that there is some fanning of our data points, showing that there is heteroscedasticity. 
+
+```{r, echo=FALSE, fig.cap="Residual vs. fitted graph for linear model without log transformation"}
+#usual linear model, without the log transformation
+lmod <- lm(SalePrice ~ ., h2)
+plot(fitted(lmod), resid(lmod), xlab='Fitted Values', ylab='Residuals') + abline(0,0)
+```
+
+#### Summary of Linear Model \newline
+
+The following shows the summary of our linear model, before adding weights.
+
+```{r,echo=FALSE}
+summary(lmod)
+```
+As you can see, the residual standard error is 41080, and the $r^2$ value is 73.66%. 
+
+### Add Weights
+
+To address the potential heteroscedasticity, we define weights(wt) inversely proportional to the squared fitted values of the initial model(lmod). This assigns higher weights to observations with smaller residuals, reducing the influence of potentially less reliable data points.
+
+```{r}
+#define weights to use
+wt <- 1 / lm(abs(lmod$residuals) ~ lmod$fitted.values)$fitted.values^2
+
+#perform weighted least squares regression
+wls_model <- lm(SalePrice ~ ., data = h2, weights=wt)
+```
+
+
+#### View the Summary of the Model, Now with Weights
+
+The following shows the summary of our model, with the weights.
+
+```{r,echo=FALSE}
+#view summary of model
+summary(wls_model)
+``` 
+
+As you can see, with the weighted model, the residual standard error is 1.363, and the $r^2$ value is 75.01%. 
+
+\newpage
+
+#### Check assumptions of the weghted least sqaure model
+
+Since this method is used to address heteroscedasticity, we do not assume constant variance of the error terms in this model. However, we still need to check the other two assumptions in the OLS model, which are linearity and zero expectation of the error terms. We will do this by checking the resdual plots of the weghted model:
+
+```{r, echo=FALSE, fig.cap="Residual vs. fitted graph for linear model without log transformation"}
+#weighted least square model
+plot(fitted(wls_model), resid(wls_model), xlab='Fitted Values', ylab='Residuals') 
+abline(0,0)
+```
+
+As we can see from the residual vs. fitted plot there is no notable patterns suggesting that the linearity assumption is violated. Also vast majority of the residuals spread evenly above and below the zero line so we can assume that the expectation of the error term is zero in this case. 
+
+#### Compare With and Without Weights \newline
+
+Comparing the summaries of lmod and wls_model, we observed changes in coefficient estimates, standard errors and $r^2$ values. Especially, the residual standard error shows a drastic change from the model without weights. This means that the values that are predicted with the weighted model are much more accurate and aligned with the actual observations. Also, because the $r^2$ value increased, we know that the weighted model is able to explain more of the variance in SalePrice.
+
+
+
+
+
